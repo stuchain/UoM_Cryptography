@@ -1,0 +1,26 @@
+/* Additional CSS styles (if needed) */
+
+.chart-tooltip {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .phases-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .button-group {
+        grid-template-columns: 1fr;
+    }
+    
+    .comparison-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
