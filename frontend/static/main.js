@@ -128,8 +128,34 @@ function displayPhaseResults(phaseNum, data) {
 function displayPhase1Results(div, data) {
     const viz = data.visualization;
     const d = data.data;
+    const steps = data.steps || [];
+    
+    let stepsHtml = '';
+    if (steps.length > 0) {
+        stepsHtml = '<div class="steps-container" style="margin-bottom: 20px;">';
+        steps.forEach((step, idx) => {
+            stepsHtml += `
+                <div class="step-item" style="margin: 12px 0; padding: 16px; background: rgba(255, 255, 255, 0.04); border-radius: 12px; border-left: 3px solid rgba(102, 126, 234, 0.5);">
+                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                        <span style="background: rgba(102, 126, 234, 0.3); color: rgba(255, 255, 255, 0.9); padding: 4px 12px; border-radius: 12px; font-weight: 700; font-size: 0.85em; margin-right: 12px;">Step ${step.step}</span>
+                        <strong style="color: rgba(255, 255, 255, 0.95); font-size: 1.05em;">${step.title}</strong>
+                    </div>
+                    <p style="color: rgba(255, 255, 255, 0.8); margin: 8px 0; line-height: 1.5;">${step.description}</p>
+                    ${step.details ? `
+                        <div style="margin-top: 10px; padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 8px; font-size: 0.9em;">
+                            ${Object.entries(step.details).map(([key, value]) => 
+                                `<div style="margin: 4px 0;"><strong style="color: rgba(102, 126, 234, 0.9);">${key.replace(/_/g, ' ')}:</strong> <span style="color: rgba(255, 255, 255, 0.85);">${typeof value === 'object' ? JSON.stringify(value) : value}</span></div>`
+                            ).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        });
+        stepsHtml += '</div>';
+    }
     
     div.innerHTML = `
+        ${stepsHtml}
         <div class="comparison-grid">
             <div class="comparison-item ${viz.keys_match ? 'match' : 'differ'}">
                 <strong>Alice's Shared Key</strong>
@@ -159,8 +185,36 @@ function displayPhase1Results(div, data) {
 function displayPhase2Results(div, data) {
     const viz = data.visualization;
     const d = data.data;
+    const steps = data.steps || [];
+    
+    let stepsHtml = '';
+    if (steps.length > 0) {
+        stepsHtml = '<div class="steps-container" style="margin-bottom: 20px;">';
+        steps.forEach((step, idx) => {
+            const isWarning = step.title.includes('MALLORY') || step.title.includes('FAKE');
+            const isAttack = step.title.includes('ATTACK');
+            stepsHtml += `
+                <div class="step-item" style="margin: 12px 0; padding: 16px; background: ${isWarning ? 'rgba(244, 67, 54, 0.1)' : isAttack ? 'rgba(244, 67, 54, 0.15)' : 'rgba(255, 255, 255, 0.04)'}; border-radius: 12px; border-left: 3px solid ${isWarning || isAttack ? 'rgba(244, 67, 54, 0.7)' : 'rgba(102, 126, 234, 0.5)'};">
+                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                        <span style="background: ${isWarning || isAttack ? 'rgba(244, 67, 54, 0.3)' : 'rgba(102, 126, 234, 0.3)'}; color: rgba(255, 255, 255, 0.9); padding: 4px 12px; border-radius: 12px; font-weight: 700; font-size: 0.85em; margin-right: 12px;">Step ${step.step}</span>
+                        <strong style="color: ${isWarning || isAttack ? 'rgba(244, 67, 54, 0.95)' : 'rgba(255, 255, 255, 0.95)'}; font-size: 1.05em;">${step.title}</strong>
+                    </div>
+                    <p style="color: rgba(255, 255, 255, 0.8); margin: 8px 0; line-height: 1.5;">${step.description}</p>
+                    ${step.details ? `
+                        <div style="margin-top: 10px; padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 8px; font-size: 0.9em;">
+                            ${Object.entries(step.details).map(([key, value]) => 
+                                `<div style="margin: 4px 0;"><strong style="color: ${isWarning || isAttack ? 'rgba(244, 67, 54, 0.9)' : 'rgba(102, 126, 234, 0.9)'};">${key.replace(/_/g, ' ')}:</strong> <span style="color: rgba(255, 255, 255, 0.85);">${typeof value === 'object' ? JSON.stringify(value) : value}</span></div>`
+                            ).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        });
+        stepsHtml += '</div>';
+    }
     
     div.innerHTML = `
+        ${stepsHtml}
         <h3 style="margin: 15px 0; color: rgba(244, 67, 54, 0.9);">Attack Results</h3>
         <div class="comparison-grid">
             <div class="comparison-item ${d.alice_bob_keys_differ ? 'differ' : 'match'}">
@@ -194,8 +248,37 @@ function displayPhase2Results(div, data) {
 
 function displayPhase3Results(div, data) {
     const d = data.data;
+    const steps = data.steps || [];
+    
+    let stepsHtml = '';
+    if (steps.length > 0) {
+        stepsHtml = '<div class="steps-container" style="margin-bottom: 20px;">';
+        steps.forEach((step, idx) => {
+            const isSuccess = step.title.includes('SUCCESS') || step.title.includes('PREVENTED');
+            const isFailure = step.title.includes('FAILED') || step.title.includes('SUCCEEDED');
+            const isSecurity = step.title.includes('Testing') || step.title.includes('Final');
+            stepsHtml += `
+                <div class="step-item" style="margin: 12px 0; padding: 16px; background: ${isSuccess ? 'rgba(76, 175, 80, 0.1)' : isFailure ? 'rgba(244, 67, 54, 0.1)' : isSecurity ? 'rgba(102, 126, 234, 0.1)' : 'rgba(255, 255, 255, 0.04)'}; border-radius: 12px; border-left: 3px solid ${isSuccess ? 'rgba(76, 175, 80, 0.7)' : isFailure ? 'rgba(244, 67, 54, 0.7)' : isSecurity ? 'rgba(102, 126, 234, 0.7)' : 'rgba(102, 126, 234, 0.5)'};">
+                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                        <span style="background: ${isSuccess ? 'rgba(76, 175, 80, 0.3)' : isFailure ? 'rgba(244, 67, 54, 0.3)' : isSecurity ? 'rgba(102, 126, 234, 0.3)' : 'rgba(102, 126, 234, 0.3)'}; color: rgba(255, 255, 255, 0.9); padding: 4px 12px; border-radius: 12px; font-weight: 700; font-size: 0.85em; margin-right: 12px;">Step ${step.step}</span>
+                        <strong style="color: ${isSuccess ? 'rgba(76, 175, 80, 0.95)' : isFailure ? 'rgba(244, 67, 54, 0.95)' : 'rgba(255, 255, 255, 0.95)'}; font-size: 1.05em;">${step.title}</strong>
+                    </div>
+                    <p style="color: rgba(255, 255, 255, 0.8); margin: 8px 0; line-height: 1.5;">${step.description}</p>
+                    ${step.details ? `
+                        <div style="margin-top: 10px; padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 8px; font-size: 0.9em;">
+                            ${Object.entries(step.details).map(([key, value]) => 
+                                `<div style="margin: 4px 0;"><strong style="color: ${isSuccess ? 'rgba(76, 175, 80, 0.9)' : isFailure ? 'rgba(244, 67, 54, 0.9)' : 'rgba(102, 126, 234, 0.9)'};">${key.replace(/_/g, ' ')}:</strong> <span style="color: rgba(255, 255, 255, 0.85);">${typeof value === 'object' ? JSON.stringify(value) : value}</span></div>`
+                            ).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        });
+        stepsHtml += '</div>';
+    }
     
     div.innerHTML = `
+        ${stepsHtml}
         <h3 style="margin: 15px 0; color: rgba(255, 255, 255, 0.95);">Authentication Results</h3>
         <div class="result-item">
             <strong>Alice's Signature:</strong> 
@@ -235,8 +318,37 @@ function displayPhase3Results(div, data) {
 function displayPhase4Results(div, data) {
     const d = data.data;
     const viz = data.visualization;
+    const steps = data.steps || [];
+    
+    let stepsHtml = '';
+    if (steps.length > 0) {
+        stepsHtml = '<div class="steps-container" style="margin-bottom: 20px;">';
+        steps.forEach((step, idx) => {
+            const isSuccess = step.title.includes('successful') || step.title.includes('detected');
+            const isFailure = step.title.includes('failed') || step.title.includes('NOT detected');
+            const isSecurity = step.title.includes('Test') || step.title.includes('Prerequisites');
+            stepsHtml += `
+                <div class="step-item" style="margin: 12px 0; padding: 16px; background: ${isSuccess ? 'rgba(76, 175, 80, 0.1)' : isFailure ? 'rgba(244, 67, 54, 0.1)' : isSecurity ? 'rgba(102, 126, 234, 0.1)' : 'rgba(255, 255, 255, 0.04)'}; border-radius: 12px; border-left: 3px solid ${isSuccess ? 'rgba(76, 175, 80, 0.7)' : isFailure ? 'rgba(244, 67, 54, 0.7)' : isSecurity ? 'rgba(102, 126, 234, 0.7)' : 'rgba(102, 126, 234, 0.5)'};">
+                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                        <span style="background: ${isSuccess ? 'rgba(76, 175, 80, 0.3)' : isFailure ? 'rgba(244, 67, 54, 0.3)' : isSecurity ? 'rgba(102, 126, 234, 0.3)' : 'rgba(102, 126, 234, 0.3)'}; color: rgba(255, 255, 255, 0.9); padding: 4px 12px; border-radius: 12px; font-weight: 700; font-size: 0.85em; margin-right: 12px;">Step ${step.step}</span>
+                        <strong style="color: ${isSuccess ? 'rgba(76, 175, 80, 0.95)' : isFailure ? 'rgba(244, 67, 54, 0.95)' : 'rgba(255, 255, 255, 0.95)'}; font-size: 1.05em;">${step.title}</strong>
+                    </div>
+                    <p style="color: rgba(255, 255, 255, 0.8); margin: 8px 0; line-height: 1.5;">${step.description}</p>
+                    ${step.details ? `
+                        <div style="margin-top: 10px; padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 8px; font-size: 0.9em;">
+                            ${Object.entries(step.details).map(([key, value]) => 
+                                `<div style="margin: 4px 0;"><strong style="color: ${isSuccess ? 'rgba(76, 175, 80, 0.9)' : isFailure ? 'rgba(244, 67, 54, 0.9)' : 'rgba(102, 126, 234, 0.9)'};">${key.replace(/_/g, ' ')}:</strong> <span style="color: rgba(255, 255, 255, 0.85);">${typeof value === 'object' ? JSON.stringify(value) : value}</span></div>`
+                            ).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        });
+        stepsHtml += '</div>';
+    }
     
     div.innerHTML = `
+        ${stepsHtml}
         <h3 style="margin: 15px 0; color: rgba(255, 255, 255, 0.95);">Encryption Results</h3>
         <div class="result-item">
             <strong>Original Message:</strong> "${d.message_original}"

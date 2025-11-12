@@ -49,26 +49,137 @@ def run_phase1():
     Run Phase 1: Basic Diffie-Hellman Key Exchange
     
     Returns:
-        JSON with keys, visualization data, and status
+        JSON with keys, visualization data, detailed steps, and status
     """
     try:
-        # Generate keypairs
+        steps = []
+        
+        # Step 1: Alice generates keypair
+        steps.append({
+            'step': 1,
+            'title': 'Alice generates X25519 keypair',
+            'description': 'Alice creates a private key (kept secret) and derives the corresponding public key using Curve25519',
+            'details': {
+                'operation': 'X25519 key generation',
+                'private_key_size': '32 bytes (256 bits)',
+                'public_key_size': '32 bytes (256 bits)',
+                'curve': 'Curve25519 (Montgomery curve)',
+                'security_level': '~128 bits'
+            }
+        })
         alice_priv, alice_pub = generate_x25519_keypair()
-        bob_priv, bob_pub = generate_x25519_keypair()
-        
         alice_pub_bytes = public_bytes(alice_pub)
+        steps.append({
+            'step': 2,
+            'title': 'Alice\'s public key ready',
+            'description': f'Alice\'s public key: {binascii.hexlify(alice_pub_bytes).decode()[:32]}...',
+            'details': {
+                'public_key_hex': binascii.hexlify(alice_pub_bytes).decode(),
+                'ready_to_send': True
+            }
+        })
+        
+        # Step 2: Bob generates keypair
+        steps.append({
+            'step': 3,
+            'title': 'Bob generates X25519 keypair',
+            'description': 'Bob independently creates his own private/public keypair',
+            'details': {
+                'operation': 'X25519 key generation',
+                'private_key_size': '32 bytes (256 bits)',
+                'public_key_size': '32 bytes (256 bits)'
+            }
+        })
+        bob_priv, bob_pub = generate_x25519_keypair()
         bob_pub_bytes = public_bytes(bob_pub)
+        steps.append({
+            'step': 4,
+            'title': 'Bob\'s public key ready',
+            'description': f'Bob\'s public key: {binascii.hexlify(bob_pub_bytes).decode()[:32]}...',
+            'details': {
+                'public_key_hex': binascii.hexlify(bob_pub_bytes).decode(),
+                'ready_to_send': True
+            }
+        })
         
-        # Derive shared keys
+        # Step 3: Key exchange (simulated)
+        steps.append({
+            'step': 5,
+            'title': 'Public key exchange',
+            'description': 'Alice sends her public key to Bob, Bob sends his public key to Alice (over insecure channel)',
+            'details': {
+                'alice_to_bob': 'Alice\'s public key transmitted',
+                'bob_to_alice': 'Bob\'s public key transmitted',
+                'channel_security': 'Insecure - no authentication yet'
+            }
+        })
+        
+        # Step 4: Alice derives shared key
+        steps.append({
+            'step': 6,
+            'title': 'Alice derives shared secret',
+            'description': 'Alice uses her private key and Bob\'s public key to compute: shared_secret = DH(alice_private, bob_public)',
+            'details': {
+                'operation': 'X25519 key exchange',
+                'formula': 'shared_secret = alice_private × bob_public',
+                'raw_secret_size': '32 bytes'
+            }
+        })
         alice_key = derive_shared_key(alice_priv, bob_pub_bytes)
-        bob_key = derive_shared_key(bob_priv, alice_pub_bytes)
+        steps.append({
+            'step': 7,
+            'title': 'Alice applies HKDF',
+            'description': 'Alice derives symmetric encryption key using HKDF-SHA256 from the raw shared secret',
+            'details': {
+                'kdf': 'HKDF-SHA256',
+                'output_length': '32 bytes (256 bits)',
+                'purpose': 'Suitable for ChaCha20-Poly1305 or AES-256',
+                'derived_key': binascii.hexlify(alice_key).decode()[:32] + '...'
+            }
+        })
         
+        # Step 5: Bob derives shared key
+        steps.append({
+            'step': 8,
+            'title': 'Bob derives shared secret',
+            'description': 'Bob uses his private key and Alice\'s public key to compute: shared_secret = DH(bob_private, alice_public)',
+            'details': {
+                'operation': 'X25519 key exchange',
+                'formula': 'shared_secret = bob_private × alice_public',
+                'raw_secret_size': '32 bytes'
+            }
+        })
+        bob_key = derive_shared_key(bob_priv, alice_pub_bytes)
+        steps.append({
+            'step': 9,
+            'title': 'Bob applies HKDF',
+            'description': 'Bob derives symmetric encryption key using HKDF-SHA256',
+            'details': {
+                'kdf': 'HKDF-SHA256',
+                'output_length': '32 bytes (256 bits)',
+                'derived_key': binascii.hexlify(bob_key).decode()[:32] + '...'
+            }
+        })
+        
+        # Step 6: Verification
         keys_match = alice_key == bob_key
+        steps.append({
+            'step': 10,
+            'title': 'Key verification',
+            'description': 'Verifying that both parties derived the same key (mathematical property of DH)',
+            'details': {
+                'alice_key': binascii.hexlify(alice_key).decode(),
+                'bob_key': binascii.hexlify(bob_key).decode(),
+                'keys_match': keys_match,
+                'result': 'SUCCESS' if keys_match else 'FAILED'
+            }
+        })
         
         return jsonify({
             'success': True,
             'phase': 1,
             'title': 'Basic Diffie-Hellman Key Exchange',
+            'steps': steps,
             'data': {
                 'alice': {
                     'public_key': binascii.hexlify(alice_pub_bytes).decode(),
@@ -103,37 +214,202 @@ def run_phase2():
     Run Phase 2: MITM Attack Demonstration
     
     Returns:
-        JSON with attack results and visualization data
+        JSON with attack results, detailed steps, and visualization data
     """
     try:
-        # Generate participants
+        steps = []
+        
+        # Step 1: Alice generates keypair
+        steps.append({
+            'step': 1,
+            'title': 'Alice generates keypair',
+            'description': 'Alice creates her X25519 keypair for key exchange',
+            'details': {'status': 'Keypair generated', 'public_key_size': '32 bytes'}
+        })
         alice_priv, alice_pub = generate_x25519_keypair()
-        bob_priv, bob_pub = generate_x25519_keypair()
+        alice_pub_bytes = public_bytes(alice_pub)
+        
+        # Step 2: Alice sends to Bob (intercepted)
+        steps.append({
+            'step': 2,
+            'title': 'Alice sends public key to Bob',
+            'description': 'Alice attempts to send her public key to Bob over the network',
+            'details': {
+                'sender': 'Alice',
+                'intended_recipient': 'Bob',
+                'public_key': binascii.hexlify(alice_pub_bytes).decode()[:32] + '...'
+            }
+        })
+        
+        # Step 3: Mallory intercepts Alice's key
+        steps.append({
+            'step': 3,
+            'title': '⚠️ MALLORY INTERCEPTS',
+            'description': 'Mallory intercepts Alice\'s public key before it reaches Bob',
+            'details': {
+                'attacker': 'Mallory',
+                'intercepted_from': 'Alice',
+                'action': 'Key intercepted and stored',
+                'vulnerability': 'No authentication - Mallory can read the key'
+            }
+        })
+        
+        # Step 4: Mallory generates fake keypairs
+        steps.append({
+            'step': 4,
+            'title': 'Mallory generates fake keypairs',
+            'description': 'Mallory creates TWO keypairs: one to impersonate Alice, one to impersonate Bob',
+            'details': {
+                'fake_alice_keypair': 'For impersonating Alice to Bob',
+                'fake_bob_keypair': 'For impersonating Bob to Alice',
+                'strategy': 'Replace real keys with fake ones'
+            }
+        })
         mallory_alice_priv, mallory_alice_pub = generate_x25519_keypair()
         mallory_bob_priv, mallory_bob_pub = generate_x25519_keypair()
-        
-        alice_pub_bytes = public_bytes(alice_pub)
-        bob_pub_bytes = public_bytes(bob_pub)
         mallory_alice_pub_bytes = public_bytes(mallory_alice_pub)
         mallory_bob_pub_bytes = public_bytes(mallory_bob_pub)
         
-        # Mallory intercepts and establishes keys
-        # Alice thinks she's talking to Bob, but it's Mallory (using bob key)
+        # Step 5: Mallory derives key with Alice
+        steps.append({
+            'step': 5,
+            'title': 'Mallory establishes key with Alice',
+            'description': 'Mallory uses her fake "Bob" keypair to derive a shared key with Alice',
+            'details': {
+                'operation': 'DH(mallory_bob_private, alice_public)',
+                'result': 'Mallory now has the key Alice thinks she shares with Bob',
+                'attack_status': 'Partial success - key established with Alice'
+            }
+        })
         alice_shared = derive_shared_key(alice_priv, mallory_bob_pub_bytes)
         mallory_key_with_alice = derive_shared_key(mallory_bob_priv, alice_pub_bytes)
         
-        # Bob thinks he's talking to Alice, but it's Mallory (using alice key)
+        # Step 6: Mallory sends fake Bob key to Alice
+        steps.append({
+            'step': 6,
+            'title': 'Mallory sends FAKE Bob key to Alice',
+            'description': 'Instead of forwarding Bob\'s real key, Mallory sends her own fake "Bob" key',
+            'details': {
+                'real_key': 'Bob\'s actual public key (intercepted)',
+                'fake_key': 'Mallory\'s fake "Bob" public key (sent to Alice)',
+                'alice_believes': 'Alice thinks she received Bob\'s key',
+                'reality': 'Alice actually received Mallory\'s fake key'
+            }
+        })
+        
+        # Step 7: Bob generates keypair
+        steps.append({
+            'step': 7,
+            'title': 'Bob generates keypair',
+            'description': 'Bob creates his X25519 keypair',
+            'details': {'status': 'Keypair generated'}
+        })
+        bob_priv, bob_pub = generate_x25519_keypair()
+        bob_pub_bytes = public_bytes(bob_pub)
+        
+        # Step 8: Bob sends to Alice (intercepted)
+        steps.append({
+            'step': 8,
+            'title': 'Bob sends public key to Alice',
+            'description': 'Bob attempts to send his public key to Alice',
+            'details': {
+                'sender': 'Bob',
+                'intended_recipient': 'Alice',
+                'public_key': binascii.hexlify(bob_pub_bytes).decode()[:32] + '...'
+            }
+        })
+        
+        # Step 9: Mallory intercepts Bob's key
+        steps.append({
+            'step': 9,
+            'title': '⚠️ MALLORY INTERCEPTS AGAIN',
+            'description': 'Mallory intercepts Bob\'s public key before it reaches Alice',
+            'details': {
+                'intercepted_from': 'Bob',
+                'action': 'Key intercepted and stored',
+                'vulnerability': 'Still no authentication'
+            }
+        })
+        
+        # Step 10: Mallory derives key with Bob
+        steps.append({
+            'step': 10,
+            'title': 'Mallory establishes key with Bob',
+            'description': 'Mallory uses her fake "Alice" keypair to derive a shared key with Bob',
+            'details': {
+                'operation': 'DH(mallory_alice_private, bob_public)',
+                'result': 'Mallory now has the key Bob thinks he shares with Alice',
+                'attack_status': 'Partial success - key established with Bob'
+            }
+        })
         bob_shared = derive_shared_key(bob_priv, mallory_alice_pub_bytes)
         mallory_key_with_bob = derive_shared_key(mallory_alice_priv, bob_pub_bytes)
         
+        # Step 11: Mallory sends fake Alice key to Bob
+        steps.append({
+            'step': 11,
+            'title': 'Mallory sends FAKE Alice key to Bob',
+            'description': 'Instead of forwarding Alice\'s real key, Mallory sends her own fake "Alice" key',
+            'details': {
+                'real_key': 'Alice\'s actual public key (intercepted)',
+                'fake_key': 'Mallory\'s fake "Alice" public key (sent to Bob)',
+                'bob_believes': 'Bob thinks he received Alice\'s key',
+                'reality': 'Bob actually received Mallory\'s fake key'
+            }
+        })
+        
+        # Step 12: Alice derives key (with fake Bob)
+        steps.append({
+            'step': 12,
+            'title': 'Alice derives shared key',
+            'description': 'Alice uses her private key and the "Bob" key she received (actually Mallory\'s fake key)',
+            'details': {
+                'operation': 'DH(alice_private, fake_bob_public)',
+                'result': f'Key: {binascii.hexlify(alice_shared).decode()[:32]}...',
+                'alice_thinks': 'Alice believes she shares this key with Bob',
+                'reality': 'Alice actually shares this key with Mallory'
+            }
+        })
+        
+        # Step 13: Bob derives key (with fake Alice)
+        steps.append({
+            'step': 13,
+            'title': 'Bob derives shared key',
+            'description': 'Bob uses his private key and the "Alice" key he received (actually Mallory\'s fake key)',
+            'details': {
+                'operation': 'DH(bob_private, fake_alice_public)',
+                'result': f'Key: {binascii.hexlify(bob_shared).decode()[:32]}...',
+                'bob_thinks': 'Bob believes he shares this key with Alice',
+                'reality': 'Bob actually shares this key with Mallory'
+            }
+        })
+        
+        # Step 14: Attack analysis
         attack_success = (alice_shared == mallory_key_with_alice and 
                          bob_shared == mallory_key_with_bob and
                          alice_shared != bob_shared)
+        steps.append({
+            'step': 14,
+            'title': '🔴 ATTACK ANALYSIS',
+            'description': 'Comparing all derived keys to verify the attack',
+            'details': {
+                'alice_key': binascii.hexlify(alice_shared).decode()[:32] + '...',
+                'bob_key': binascii.hexlify(bob_shared).decode()[:32] + '...',
+                'mallory_alice_key': binascii.hexlify(mallory_key_with_alice).decode()[:32] + '...',
+                'mallory_bob_key': binascii.hexlify(mallory_key_with_bob).decode()[:32] + '...',
+                'alice_bob_match': alice_shared == bob_shared,
+                'alice_mallory_match': alice_shared == mallory_key_with_alice,
+                'bob_mallory_match': bob_shared == mallory_key_with_bob,
+                'attack_success': attack_success,
+                'conclusion': 'Mallory can decrypt all messages between Alice and Bob!' if attack_success else 'Attack failed'
+            }
+        })
         
         return jsonify({
             'success': True,
             'phase': 2,
             'title': 'Man-in-the-Middle Attack',
+            'steps': steps,
             'data': {
                 'alice': {
                     'public_key': binascii.hexlify(alice_pub_bytes).decode(),
@@ -178,71 +454,230 @@ def run_phase3():
     Run Phase 3: Authenticated Diffie-Hellman
     
     Returns:
-        JSON with authentication results
+        JSON with authentication results and detailed steps
     """
     try:
-        # Generate keypairs (DH + Ed25519)
-        alice_dh_priv, alice_dh_pub = generate_x25519_keypair()
-        bob_dh_priv, bob_dh_pub = generate_x25519_keypair()
+        steps = []
         
+        # Step 1: Alice generates keypairs
+        steps.append({
+            'step': 1,
+            'title': 'Alice generates TWO keypairs',
+            'description': 'Alice creates both an X25519 keypair (for DH) and an Ed25519 keypair (for signing)',
+            'details': {
+                'dh_keypair': 'X25519 - ephemeral, for key exchange',
+                'signing_keypair': 'Ed25519 - long-term, for authentication',
+                'purpose': 'DH keypair changes per session, signing keypair is identity'
+            }
+        })
+        alice_dh_priv, alice_dh_pub = generate_x25519_keypair()
         alice_signing_priv = ed25519.Ed25519PrivateKey.generate()
         alice_signing_pub = alice_signing_priv.public_key()
-        
-        bob_signing_priv = ed25519.Ed25519PrivateKey.generate()
-        bob_signing_pub = bob_signing_priv.public_key()
-        
         alice_dh_pub_bytes = public_bytes(alice_dh_pub)
-        bob_dh_pub_bytes = public_bytes(bob_dh_pub)
         alice_signing_pub_bytes = alice_signing_pub.public_bytes(
             encoding=serialization.Encoding.Raw,
             format=serialization.PublicFormat.Raw
         )
+        
+        # Step 2: Alice signs her DH public key
+        steps.append({
+            'step': 2,
+            'title': 'Alice signs her DH public key',
+            'description': 'Alice uses her Ed25519 private key to sign her DH public key, creating a cryptographic proof',
+            'details': {
+                'operation': 'Ed25519_Sign(alice_signing_private, alice_dh_public)',
+                'signature_size': '64 bytes',
+                'purpose': 'Proves that Alice owns both the DH key and the signing key',
+                'security': 'Only someone with alice_signing_private can create this signature'
+            }
+        })
+        alice_signature = alice_signing_priv.sign(alice_dh_pub_bytes)
+        steps.append({
+            'step': 3,
+            'title': 'Alice sends authenticated message',
+            'description': 'Alice sends (DH_public_key, signing_public_key, signature) to Bob',
+            'details': {
+                'message_components': 'DH key + signing key + signature',
+                'authentication': 'Signature binds DH key to Alice\'s identity'
+            }
+        })
+        
+        # Step 3: Bob generates keypairs
+        steps.append({
+            'step': 4,
+            'title': 'Bob generates TWO keypairs',
+            'description': 'Bob creates his own X25519 and Ed25519 keypairs',
+            'details': {
+                'dh_keypair': 'X25519 - ephemeral',
+                'signing_keypair': 'Ed25519 - long-term identity'
+            }
+        })
+        bob_dh_priv, bob_dh_pub = generate_x25519_keypair()
+        bob_signing_priv = ed25519.Ed25519PrivateKey.generate()
+        bob_signing_pub = bob_signing_priv.public_key()
+        bob_dh_pub_bytes = public_bytes(bob_dh_pub)
         bob_signing_pub_bytes = bob_signing_pub.public_bytes(
             encoding=serialization.Encoding.Raw,
             format=serialization.PublicFormat.Raw
         )
         
-        # Sign and verify
-        alice_signature = alice_signing_priv.sign(alice_dh_pub_bytes)
-        
-        # Verify Alice's signature (Bob's perspective)
+        # Step 4: Bob verifies Alice's signature
+        steps.append({
+            'step': 5,
+            'title': 'Bob verifies Alice\'s signature',
+            'description': 'Bob uses Alice\'s Ed25519 public key to verify the signature on her DH public key',
+            'details': {
+                'operation': 'Ed25519_Verify(alice_signing_public, signature, alice_dh_public)',
+                'verification': 'Checks if signature was created with alice_signing_private',
+                'result_if_valid': 'Proves the DH key is authentic and belongs to Alice'
+            }
+        })
         try:
             bob_signing_pub.verify(alice_signature, alice_dh_pub_bytes)
             alice_signature_valid = True
             bob_key = derive_shared_key(bob_dh_priv, alice_dh_pub_bytes)
+            steps.append({
+                'step': 6,
+                'title': '✅ Signature verification SUCCESS',
+                'description': 'Bob verified Alice\'s signature and derived the shared key',
+                'details': {
+                    'verification_result': 'VALID',
+                    'action': 'Key exchange proceeds',
+                    'shared_key': binascii.hexlify(bob_key).decode()[:32] + '...'
+                }
+            })
         except InvalidSignature:
             alice_signature_valid = False
             bob_key = None
+            steps.append({
+                'step': 6,
+                'title': '❌ Signature verification FAILED',
+                'description': 'Bob rejected Alice\'s key due to invalid signature',
+                'details': {
+                    'verification_result': 'INVALID',
+                    'action': 'Key exchange REJECTED - possible MITM attack',
+                    'security': 'Attack prevented!'
+                }
+            })
         
-        # Bob signs
+        # Step 5: Bob signs his DH public key
+        steps.append({
+            'step': 7,
+            'title': 'Bob signs his DH public key',
+            'description': 'Bob signs his DH public key with his Ed25519 private key',
+            'details': {
+                'operation': 'Ed25519_Sign(bob_signing_private, bob_dh_public)',
+                'signature_size': '64 bytes'
+            }
+        })
         bob_signature = bob_signing_priv.sign(bob_dh_pub_bytes)
+        steps.append({
+            'step': 8,
+            'title': 'Bob sends authenticated message',
+            'description': 'Bob sends (DH_public_key, signing_public_key, signature) to Alice',
+            'details': {
+                'message_components': 'DH key + signing key + signature'
+            }
+        })
         
-        # Verify Bob's signature (Alice's perspective)
+        # Step 6: Alice verifies Bob's signature
+        steps.append({
+            'step': 9,
+            'title': 'Alice verifies Bob\'s signature',
+            'description': 'Alice uses Bob\'s Ed25519 public key to verify the signature',
+            'details': {
+                'operation': 'Ed25519_Verify(bob_signing_public, signature, bob_dh_public)',
+                'verification': 'Checks if signature was created with bob_signing_private'
+            }
+        })
         try:
             alice_signing_pub.verify(bob_signature, bob_dh_pub_bytes)
             bob_signature_valid = True
             alice_key = derive_shared_key(alice_dh_priv, bob_dh_pub_bytes)
+            steps.append({
+                'step': 10,
+                'title': '✅ Signature verification SUCCESS',
+                'description': 'Alice verified Bob\'s signature and derived the shared key',
+                'details': {
+                    'verification_result': 'VALID',
+                    'action': 'Key exchange proceeds',
+                    'shared_key': binascii.hexlify(alice_key).decode()[:32] + '...'
+                }
+            })
         except InvalidSignature:
             bob_signature_valid = False
             alice_key = None
+            steps.append({
+                'step': 10,
+                'title': '❌ Signature verification FAILED',
+                'description': 'Alice rejected Bob\'s key due to invalid signature',
+                'details': {
+                    'verification_result': 'INVALID',
+                    'action': 'Key exchange REJECTED'
+                }
+            })
         
         authenticated = alice_signature_valid and bob_signature_valid
         keys_match = authenticated and (alice_key == bob_key)
         
-        # Test Mallory's attack (should fail)
+        # Step 7: Test Mallory's attack
+        steps.append({
+            'step': 11,
+            'title': '🔒 Testing MITM Attack Prevention',
+            'description': 'Simulating Mallory attempting to forge Alice\'s signature',
+            'details': {
+                'attack_scenario': 'Mallory tries to create a fake signature for Alice\'s DH key',
+                'mallory_has': 'Mallory\'s own signing keypair',
+                'mallory_needs': 'Alice\'s private signing key (which she doesn\'t have)'
+            }
+        })
         mallory_signing_priv = ed25519.Ed25519PrivateKey.generate()
         mallory_signature = mallory_signing_priv.sign(alice_dh_pub_bytes)
         
         try:
             alice_signing_pub.verify(mallory_signature, alice_dh_pub_bytes)
             mallory_attack_succeeds = True
+            steps.append({
+                'step': 12,
+                'title': '❌ ATTACK SUCCEEDED (UNEXPECTED)',
+                'description': 'Mallory\'s fake signature was accepted - this should not happen!',
+                'details': {
+                    'verification_result': 'INVALID signature accepted (BUG!)',
+                    'security': 'CRITICAL FAILURE'
+                }
+            })
         except InvalidSignature:
             mallory_attack_succeeds = False
+            steps.append({
+                'step': 12,
+                'title': '✅ ATTACK PREVENTED',
+                'description': 'Mallory\'s fake signature was correctly rejected',
+                'details': {
+                    'verification_result': 'INVALID signature rejected',
+                    'reason': 'Mallory cannot forge signatures without Alice\'s private key',
+                    'security': 'MITM attack prevented!'
+                }
+            })
+        
+        steps.append({
+            'step': 13,
+            'title': '🔐 Final Authentication Status',
+            'description': 'Summary of authentication and key exchange results',
+            'details': {
+                'alice_signature_valid': alice_signature_valid,
+                'bob_signature_valid': bob_signature_valid,
+                'authenticated': authenticated,
+                'keys_match': keys_match,
+                'mallory_attack_prevented': not mallory_attack_succeeds,
+                'result': 'SUCCESS - Secure authenticated key exchange' if authenticated and keys_match and not mallory_attack_succeeds else 'FAILED'
+            }
+        })
         
         return jsonify({
             'success': True,
             'phase': 3,
             'title': 'Authenticated Diffie-Hellman',
+            'steps': steps,
             'data': {
                 'alice': {
                     'dh_public_key': binascii.hexlify(alice_dh_pub_bytes).decode(),
@@ -282,40 +717,167 @@ def run_phase4():
     Run Phase 4: Secure Channel with AEAD
     
     Returns:
-        JSON with encryption results
+        JSON with encryption results and detailed steps
     """
     try:
+        steps = []
+        
+        # Step 1: Key exchange (simplified - assume already done)
+        steps.append({
+            'step': 1,
+            'title': 'Prerequisites: Authenticated Key Exchange',
+            'description': 'Alice and Bob have already completed authenticated DH key exchange (Phase 3)',
+            'details': {
+                'shared_key_established': '32-byte symmetric key derived',
+                'authentication': 'Both parties verified via Ed25519 signatures',
+                'security': 'Key is authenticated and secret'
+            }
+        })
+        
         # Generate keypairs
         alice_dh_priv, alice_dh_pub = generate_x25519_keypair()
         bob_dh_priv, bob_dh_pub = generate_x25519_keypair()
-        
-        alice_signing_priv = ed25519.Ed25519PrivateKey.generate()
-        bob_signing_priv = ed25519.Ed25519PrivateKey.generate()
-        
         alice_dh_pub_bytes = public_bytes(alice_dh_pub)
         bob_dh_pub_bytes = public_bytes(bob_dh_pub)
         
         # Derive shared key
         shared_key = derive_shared_key(alice_dh_priv, bob_dh_pub_bytes)
+        steps.append({
+            'step': 2,
+            'title': 'Shared symmetric key ready',
+            'description': '32-byte symmetric key derived from authenticated DH exchange',
+            'details': {
+                'key_size': '32 bytes (256 bits)',
+                'key_type': 'Suitable for ChaCha20-Poly1305 or AES-256-GCM',
+                'key_preview': binascii.hexlify(shared_key).decode()[:32] + '...'
+            }
+        })
         
         # Initialize cipher
+        steps.append({
+            'step': 3,
+            'title': 'Initialize ChaCha20-Poly1305 cipher',
+            'description': 'Create an AEAD cipher instance with the shared key',
+            'details': {
+                'cipher': 'ChaCha20-Poly1305',
+                'encryption': 'ChaCha20 stream cipher (confidentiality)',
+                'authentication': 'Poly1305 MAC (integrity)',
+                'mode': 'AEAD (Authenticated Encryption with Associated Data)'
+            }
+        })
         cipher = ChaCha20Poly1305(shared_key)
         
-        # Encrypt a message
+        # Prepare message
         test_message = b"Hello Bob! This is a secret message."
+        steps.append({
+            'step': 4,
+            'title': 'Alice prepares message',
+            'description': f'Alice wants to send a secret message to Bob: "{test_message.decode()}"',
+            'details': {
+                'message_length': f'{len(test_message)} bytes',
+                'message_type': 'Plaintext (unencrypted)',
+                'security_requirement': 'Must be encrypted and authenticated'
+            }
+        })
+        
+        # Generate nonce
+        steps.append({
+            'step': 5,
+            'title': 'Generate unique nonce',
+            'description': 'Generate a 12-byte nonce (number used once) for this encryption',
+            'details': {
+                'nonce_size': '12 bytes (96 bits)',
+                'nonce_type': 'Random (can be public)',
+                'critical_requirement': 'MUST be unique for each encryption with same key',
+                'security': 'Reusing nonce breaks security!'
+            }
+        })
         nonce = os.urandom(12)
         associated_data = b""  # Empty associated data for this demo
-        # ChaCha20Poly1305.encrypt() signature: encrypt(nonce, data, associated_data)
-        ciphertext = cipher.encrypt(nonce, test_message, associated_data)
         
-        # Decrypt message
+        # Encrypt
+        steps.append({
+            'step': 6,
+            'title': 'Encrypt message with ChaCha20-Poly1305',
+            'description': 'Encrypt the plaintext and compute authentication tag in one operation',
+            'details': {
+                'operation': 'ChaCha20-Poly1305.encrypt(nonce, plaintext, associated_data)',
+                'process': '1. Encrypt plaintext with ChaCha20, 2. Compute Poly1305 MAC',
+                'output': 'Ciphertext + 16-byte authentication tag'
+            }
+        })
+        ciphertext = cipher.encrypt(nonce, test_message, associated_data)
+        steps.append({
+            'step': 7,
+            'title': 'Encryption complete',
+            'description': 'Message encrypted and authenticated',
+            'details': {
+                'plaintext_length': f'{len(test_message)} bytes',
+                'ciphertext_length': f'{len(ciphertext)} bytes',
+                'overhead': f'{len(ciphertext) - len(test_message)} bytes (authentication tag)',
+                'nonce_hex': binascii.hexlify(nonce).decode()
+            }
+        })
+        
+        # Decrypt
+        steps.append({
+            'step': 8,
+            'title': 'Bob receives encrypted message',
+            'description': 'Bob receives (ciphertext, nonce) from Alice',
+            'details': {
+                'received': 'Ciphertext + nonce',
+                'next_step': 'Decrypt and verify authentication tag'
+            }
+        })
+        steps.append({
+            'step': 9,
+            'title': 'Decrypt and verify message',
+            'description': 'Bob decrypts the ciphertext and verifies the Poly1305 authentication tag',
+            'details': {
+                'operation': 'ChaCha20-Poly1305.decrypt(nonce, ciphertext, associated_data)',
+                'process': '1. Verify Poly1305 MAC, 2. If valid, decrypt with ChaCha20',
+                'security': 'If MAC is invalid, decryption fails (tampering detected)'
+            }
+        })
         try:
-            # ChaCha20Poly1305.decrypt() signature: decrypt(nonce, data, associated_data)
             decrypted = cipher.decrypt(nonce, ciphertext, associated_data)
             decryption_success = decrypted == test_message
+            steps.append({
+                'step': 10,
+                'title': '✅ Decryption successful',
+                'description': 'Message decrypted and verified successfully',
+                'details': {
+                    'decryption_result': 'SUCCESS',
+                    'authentication': 'Poly1305 MAC verified',
+                    'message_matches': decryption_success,
+                    'decrypted_message': decrypted.decode()
+                }
+            })
         except InvalidTag:
             decryption_success = False
             decrypted = None
+            steps.append({
+                'step': 10,
+                'title': '❌ Decryption failed',
+                'description': 'Authentication tag verification failed',
+                'details': {
+                    'decryption_result': 'FAILED',
+                    'reason': 'Invalid authentication tag',
+                    'possible_cause': 'Message tampered or wrong key'
+                }
+            })
+        
+        # Test tampering detection
+        steps.append({
+            'step': 11,
+            'title': '🔒 Test tampering detection',
+            'description': 'Simulate an attacker modifying the ciphertext',
+            'details': {
+                'attack': 'Flip bits in ciphertext',
+                'modification': 'XOR byte at position 10 with 0xFF',
+                'expected_result': 'Decryption should fail with InvalidTag exception'
+            }
+        })
         
         # Test tampering detection
         tampered_ciphertext = bytearray(ciphertext)
@@ -324,13 +886,33 @@ def run_phase4():
         try:
             cipher.decrypt(nonce, bytes(tampered_ciphertext), associated_data)
             tampering_detected = False
+            steps.append({
+                'step': 13,
+                'title': '❌ Tampering NOT detected (UNEXPECTED)',
+                'description': 'Modified ciphertext was accepted - this should not happen!',
+                'details': {
+                    'result': 'CRITICAL FAILURE',
+                    'security': 'Integrity check failed'
+                }
+            })
         except InvalidTag:
             tampering_detected = True
+            steps.append({
+                'step': 13,
+                'title': '✅ Tampering detected',
+                'description': 'Modified ciphertext was correctly rejected',
+                'details': {
+                    'result': 'SUCCESS',
+                    'security': 'Poly1305 MAC detected tampering',
+                    'action': 'Message rejected - integrity protection working'
+                }
+            })
         
         return jsonify({
             'success': True,
             'phase': 4,
             'title': 'Secure Channel with AEAD',
+            'steps': steps,
             'data': {
                 'message_length': len(test_message),
                 'ciphertext_length': len(ciphertext),
