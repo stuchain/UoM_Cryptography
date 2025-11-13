@@ -44,7 +44,7 @@ This project demonstrates the **complete evolution** of a secure communication c
 │                    Application Layer                        │
 │  ┌──────────────────────────────────────────────────────┐  │
 │  │  Flask Backend (app.py)                              │  │
-│  │  - REST API endpoints (/api/phase1, /api/phase2...)  │  │
+│  │  - REST API endpoints (/api/phase1-6)                │  │
 │  │  - Orchestrates phase execution                      │  │
 │  │  - Returns JSON with results and visualization data  │  │
 │  └──────────────────────────────────────────────────────┘  │
@@ -56,10 +56,10 @@ This project demonstrates the **complete evolution** of a secure communication c
 │  │  Phase 1:    │  │  Phase 2:    │  │  Phase 3:    │     │
 │  │  Basic DH    │  │  MITM Attack │  │  Auth DH     │     │
 │  └──────────────┘  └──────────────┘  └──────────────┘     │
-│  ┌──────────────┐  ┌──────────────┐                       │
-│  │  Phase 4:    │  │  Phase 5:    │                       │
-│  │  AEAD        │  │  Blockchain  │                       │
-│  └──────────────┘  └──────────────┘                       │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
+│  │  Phase 4:    │  │  Phase 5:    │  │  Phase 6:    │     │
+│  │  AEAD        │  │  Blockchain  │  │  Attack Prev │     │
+│  └──────────────┘  └──────────────┘  └──────────────┘     │
 └─────────────────────────────────────────────────────────────┘
                             │
 ┌───────────────────────────▼─────────────────────────────────┐
@@ -98,6 +98,8 @@ secure_channel/
 │   ├── phase5_solana/        # Blockchain integration
 │   │   ├── solana_registry/  # Solana smart contract
 │   │   └── solana_registry_client.py # Python client
+│   ├── phase6_blockchain_attack/  # Blockchain attack prevention
+│   │   └── blockchain_mitm_attack.py # Attack demonstration
 │   └── visualizations/       # Diagram generation utilities
 │
 ├── frontend/                  # Web interface
@@ -120,6 +122,7 @@ secure_channel/
     ├── PHASE3_DETAILED.md     # Phase 3 deep dive
     ├── PHASE4_DETAILED.md     # Phase 4 deep dive
     ├── PHASE5_DETAILED.md     # Phase 5 deep dive
+    ├── PHASE6_DETAILED.md     # Phase 6 deep dive
     └── FRONTEND_DETAILED.md   # Frontend architecture
 ```
 
@@ -158,6 +161,7 @@ Each phase is a **standalone Python module** that can be run independently or im
 - `POST /api/phase3` - Execute Phase 3, return JSON results
 - `POST /api/phase4` - Execute Phase 4, return JSON results
 - `POST /api/phase5` - Execute Phase 5, return JSON results
+- `POST /api/phase6` - Execute Phase 6, return JSON results
 - `POST /api/run-all` - Execute all phases sequentially
 
 **Response Format:**
@@ -328,6 +332,13 @@ Phase 4: Secure Channel
          │
          ▼
 Phase 5: Blockchain Integration
+    ├─► Adds decentralized key registry
+    └─► Solana blockchain for key storage
+
+Phase 6: Blockchain Attack Prevention
+    ├─► Mallory attempts 4 different attacks
+    ├─► All attacks are prevented
+    └─► Demonstrates blockchain security properties
     │
     ├─► Decentralized key registry
     └─► Trustless key verification
@@ -381,6 +392,7 @@ decrypt_message()  # New function
 3. **Learn Phase 3** - See how authentication fixes it
 4. **Explore Phase 4** - See complete secure channel
 5. **Discover Phase 5** - See blockchain integration
+6. **Verify Phase 6** - See how blockchain prevents attacks
 
 ### Code Comments
 
@@ -432,6 +444,7 @@ decrypt_message()  # New function
 - **Phase 3**: ~20ms (includes signature generation/verification)
 - **Phase 4**: ~25ms (includes encryption/decryption)
 - **Phase 5**: ~2-5 seconds (blockchain network calls)
+- **Phase 6**: ~30ms (attack simulation + verification)
 
 ### Resource Usage
 
@@ -482,6 +495,7 @@ The system is designed to be **understood**, not just used. Every component has 
 **Next Steps:**
 - Read `PHASE1_DETAILED.md` for Phase 1 deep dive
 - Read `PHASE2_DETAILED.md` for Phase 2 deep dive
+- Read `PHASE6_DETAILED.md` for Phase 6 deep dive
 - Continue through all phase documentation
 - Read `FRONTEND_DETAILED.md` for frontend architecture
 

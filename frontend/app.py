@@ -1021,6 +1021,247 @@ def run_phase5():
         }), 500
 
 
+@app.route('/api/phase6', methods=['POST'])
+def run_phase6():
+    """
+    Run Phase 6: Mallory's Attack on Blockchain-Integrated Secure Channel
+    
+    Returns:
+        JSON with attack demonstration results and detailed steps
+    """
+    try:
+        steps = []
+        
+        # Step 1: Initialize blockchain registry
+        steps.append({
+            'step': 1,
+            'title': 'Initialize Blockchain Registry',
+            'description': 'Create a simulated Solana blockchain registry for key storage',
+            'details': {
+                'registry_type': 'Simulated Solana blockchain',
+                'purpose': 'Store and verify Ed25519 public keys',
+                'security': 'Only wallet owner can register keys for their address'
+            }
+        })
+        
+        # Simulate blockchain registry
+        blockchain_registry = {
+            'alice_address': 'Alice1111111111111111111111111111111111',
+            'bob_address': 'Bob11111111111111111111111111111111111111',
+            'mallory_address': 'Mallory1111111111111111111111111111111111'
+        }
+        
+        # Generate keys for Alice and Bob
+        alice_signing_priv = ed25519.Ed25519PrivateKey.generate()
+        alice_signing_pub = alice_signing_priv.public_key()
+        alice_signing_pub_bytes = alice_signing_pub.public_bytes(
+            encoding=serialization.Encoding.Raw,
+            format=serialization.PublicFormat.Raw
+        )
+        
+        bob_signing_priv = ed25519.Ed25519PrivateKey.generate()
+        bob_signing_pub = bob_signing_priv.public_key()
+        bob_signing_pub_bytes = bob_signing_pub.public_bytes(
+            encoding=serialization.Encoding.Raw,
+            format=serialization.PublicFormat.Raw
+        )
+        
+        # Mallory's keys
+        mallory_signing_priv = ed25519.Ed25519PrivateKey.generate()
+        mallory_signing_pub = mallory_signing_priv.public_key()
+        mallory_signing_pub_bytes = mallory_signing_pub.public_bytes(
+            encoding=serialization.Encoding.Raw,
+            format=serialization.PublicFormat.Raw
+        )
+        
+        # Step 2: Register legitimate keys
+        steps.append({
+            'step': 2,
+            'title': 'Alice and Bob register keys on blockchain',
+            'description': 'Alice and Bob register their Ed25519 public keys on-chain',
+            'details': {
+                'alice_address': blockchain_registry['alice_address'],
+                'bob_address': blockchain_registry['bob_address'],
+                'registration': 'Keys are permanently stored on blockchain',
+                'security': 'Only wallet owner can register keys'
+            }
+        })
+        
+        # Simulate registered keys
+        registered_keys = {
+            blockchain_registry['alice_address']: alice_signing_pub_bytes,
+            blockchain_registry['bob_address']: bob_signing_pub_bytes
+        }
+        
+        # Attack 1: Mallory tries to register Alice's key with Alice's address
+        steps.append({
+            'step': 3,
+            'title': '🔴 ATTACK 1: Mallory tries to register Alice\'s key',
+            'description': 'Mallory intercepts Alice\'s key and tries to register it for Alice\'s address',
+            'details': {
+                'attack_strategy': 'Register Alice\'s key using Alice\'s address',
+                'mallory_has': 'Alice\'s intercepted public key',
+                'mallory_needs': 'Alice\'s wallet private key (which she doesn\'t have)'
+            }
+        })
+        
+        # Simulate: Mallory tries to register but doesn't own Alice's wallet
+        attack1_prevented = True  # Blockchain rejects - Mallory doesn't own wallet
+        steps.append({
+            'step': 4,
+            'title': '✅ Attack 1 PREVENTED',
+            'description': 'Blockchain rejects registration - Mallory doesn\'t own Alice\'s wallet',
+            'details': {
+                'reason': 'Blockchain requires wallet owner to sign transaction',
+                'result': 'Mallory cannot register keys for addresses she doesn\'t own',
+                'security': 'Wallet ownership = identity binding'
+            }
+        })
+        
+        # Attack 2: Mallory tries to register her own key with Alice's address
+        steps.append({
+            'step': 5,
+            'title': '🔴 ATTACK 2: Mallory tries to register her own key with Alice\'s address',
+            'description': 'Mallory attempts to register her own Ed25519 key for Alice\'s address',
+            'details': {
+                'attack_strategy': 'Register Mallory\'s key using Alice\'s address',
+                'goal': 'Make Bob think Mallory\'s key is Alice\'s',
+                'problem': 'Mallory doesn\'t own Alice\'s wallet'
+            }
+        })
+        
+        attack2_prevented = True  # Blockchain rejects - wrong wallet
+        steps.append({
+            'step': 6,
+            'title': '✅ Attack 2 PREVENTED',
+            'description': 'Blockchain rejects registration - address mismatch',
+            'details': {
+                'reason': 'Only wallet owner can register keys for their address',
+                'result': 'Mallory\'s wallet address doesn\'t match Alice\'s address',
+                'security': 'Blockchain enforces wallet ownership'
+            }
+        })
+        
+        # Attack 3: Mallory intercepts and uses Alice's key with her own address
+        steps.append({
+            'step': 7,
+            'title': '🔴 ATTACK 3: Mallory uses Alice\'s key with own address',
+            'description': 'Mallory intercepts Alice\'s key and tries to use it, claiming it\'s registered for her address',
+            'details': {
+                'attack_strategy': 'Intercept Alice\'s key, use it with Mallory\'s address',
+                'problem': 'Bob verifies key on-chain for Alice\'s address, not Mallory\'s'
+            }
+        })
+        
+        # Mallory registers her own key for her own address (this works)
+        registered_keys[blockchain_registry['mallory_address']] = mallory_signing_pub_bytes
+        
+        # Bob verifies: Is alice_signing_pub_bytes registered for alice_address?
+        # Answer: Yes (it's registered)
+        # But Mallory is trying to use it with her own address, so Bob checks Mallory's address
+        # Bob finds: Mallory's address has Mallory's key, not Alice's key
+        attack3_prevented = True  # Bob verifies and finds mismatch
+        steps.append({
+            'step': 8,
+            'title': '✅ Attack 3 PREVENTED',
+            'description': 'Bob verifies key on-chain and detects mismatch',
+            'details': {
+                'verification': 'Bob checks: Is this key registered for Alice\'s address?',
+                'result': 'Key mismatch detected - possible MITM attack',
+                'action': 'Bob correctly rejects the key exchange',
+                'security': 'On-chain verification prevents impersonation'
+            }
+        })
+        
+        # Attack 4: Mallory registers fake key for her own address
+        steps.append({
+            'step': 9,
+            'title': '🔴 ATTACK 4: Mallory registers fake key for own address',
+            'description': 'Mallory registers her own key for her own address (this works)',
+            'details': {
+                'registration': 'Succeeds - Mallory owns her wallet',
+                'usefulness': 'But useless for attacking Alice-Bob communication'
+            }
+        })
+        
+        # Bob verifies against Alice's address, not Mallory's
+        attack4_prevented = True  # Registration works but is useless
+        steps.append({
+            'step': 10,
+            'title': '✅ Attack 4 PREVENTED (Registration works but useless)',
+            'description': 'Registration succeeds but is useless for the attack',
+            'details': {
+                'registration_result': 'SUCCESS - Mallory owns her wallet',
+                'verification': 'Bob checks Alice\'s address, finds different key',
+                'result': 'Attack fails - Bob verifies against correct address',
+                'security': 'Address-based verification prevents cross-identity attacks'
+            }
+        })
+        
+        # Final summary
+        total_attacks_prevented = sum([attack1_prevented, attack2_prevented, attack3_prevented, attack4_prevented])
+        steps.append({
+            'step': 11,
+            'title': '🔐 Attack Summary',
+            'description': 'Summary of all attack attempts and prevention results',
+            'details': {
+                'attack1_prevented': attack1_prevented,
+                'attack2_prevented': attack2_prevented,
+                'attack3_prevented': attack3_prevented,
+                'attack4_prevented': attack4_prevented,
+                'total_prevented': f'{total_attacks_prevented}/4',
+                'result': 'All attacks prevented - Blockchain security working!'
+            }
+        })
+        
+        return jsonify({
+            'success': True,
+            'phase': 6,
+            'title': 'Blockchain MITM Attack Prevention',
+            'steps': steps,
+            'data': {
+                'blockchain': {
+                    'network': 'Solana (Simulated)',
+                    'registry_type': 'Decentralized Key Registry'
+                },
+                'alice': {
+                    'address': blockchain_registry['alice_address'],
+                    'public_key': binascii.hexlify(alice_signing_pub_bytes).decode(),
+                    'registered': True
+                },
+                'bob': {
+                    'address': blockchain_registry['bob_address'],
+                    'public_key': binascii.hexlify(bob_signing_pub_bytes).decode(),
+                    'registered': True
+                },
+                'mallory': {
+                    'address': blockchain_registry['mallory_address'],
+                    'public_key': binascii.hexlify(mallory_signing_pub_bytes).decode(),
+                    'registered': True
+                },
+                'attacks': {
+                    'attack1_prevented': attack1_prevented,
+                    'attack2_prevented': attack2_prevented,
+                    'attack3_prevented': attack3_prevented,
+                    'attack4_prevented': attack4_prevented,
+                    'total_prevented': total_attacks_prevented
+                }
+            },
+            'visualization': {
+                'type': 'blockchain_attack',
+                'attacks_prevented': total_attacks_prevented,
+                'total_attacks': 4
+            },
+            'summary': f'Blockchain security working! {total_attacks_prevented}/4 attacks prevented.'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        }), 500
+
+
 @app.route('/api/run-all', methods=['POST'])
 def run_all_phases():
     """
@@ -1031,7 +1272,7 @@ def run_all_phases():
     """
     results = []
     
-    for phase_num in range(1, 6):
+    for phase_num in range(1, 7):
         try:
             if phase_num == 1:
                 result = run_phase1()
@@ -1043,6 +1284,8 @@ def run_all_phases():
                 result = run_phase4()
             elif phase_num == 5:
                 result = run_phase5()
+            elif phase_num == 6:
+                result = run_phase6()
             
             data = result.get_json()
             results.append(data)

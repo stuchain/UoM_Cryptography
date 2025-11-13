@@ -38,6 +38,7 @@ secure_channel/
 │   ├── phase3_auth/        # Authenticated DH
 │   ├── phase4_aead/        # Secure channel with AEAD
 │   ├── phase5_solana/      # Blockchain integration
+│   ├── phase6_blockchain_attack/  # Blockchain attack prevention
 │   └── visualizations/     # Diagram generators
 │
 ├── frontend/               # Web interface
@@ -64,6 +65,7 @@ secure_channel/
 3. **Phase 3: Authenticated DH** - Ed25519 signatures prevent attacks
 4. **Phase 4: Secure Channel** - ChaCha20-Poly1305 AEAD encryption
 5. **Phase 5: Blockchain** - Solana-based key registry
+6. **Phase 6: Blockchain Attack Prevention** - Mallory's attacks on blockchain, all prevented
 
 ---
 
@@ -104,6 +106,8 @@ python phases/phase1_dh/dh_exchange.py
 python phases/phase2_mitm/mallory_attack.py
 python phases/phase3_auth/authenticated_dh.py
 python phases/phase4_aead/secure_channel.py
+python phases/phase5_solana/solana_registry_client.py
+python phases/phase6_blockchain_attack/blockchain_mitm_attack.py
 ```
 
 Run all phases:
@@ -137,6 +141,7 @@ By exploring this project, you will understand:
 - How AEAD schemes provide confidentiality and integrity
 - Blockchain as a decentralized trust layer for PKI
 - Real-world attacks (MITM) and their mitigations
+- How blockchain prevents impersonation attacks through wallet ownership
 
 ---
 

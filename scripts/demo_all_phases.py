@@ -127,6 +127,10 @@ This demo will run all phases of the secure channel implementation:
   5. Blockchain Integration (Solana)
      - Uses Solana blockchain as a decentralized key registry
      - Adds an additional trust layer for key verification
+  
+  6. Blockchain Attack Prevention
+     - Demonstrates Mallory's attacks on blockchain-integrated system
+     - Shows how blockchain prevents all attack attempts
     
 Press Enter to start, or Ctrl+C to cancel...
     """)
@@ -186,6 +190,17 @@ Press Enter to start, or Ctrl+C to cancel...
     run_phase(5, "Blockchain Integration (Solana)", 
               "phases/phase5_solana/solana_registry_client.py")
     
+    input("\nPress Enter to continue to Phase 6...")
+    
+    # ========================================================================
+    # PHASE 6: Blockchain Attack Prevention
+    # ========================================================================
+    # Demonstrates Mallory's attacks on blockchain-integrated secure channel
+    # Shows how blockchain prevents all attack attempts through wallet ownership
+    # and verifiable key registry
+    run_phase(6, "Blockchain Attack Prevention", 
+              "phases/phase6_blockchain_attack/blockchain_mitm_attack.py")
+    
     # ========================================================================
     # Summary and Key Takeaways
     # ========================================================================
@@ -212,6 +227,11 @@ All phases have been demonstrated. Key takeaways:
 5. [SUCCESS] Blockchain adds decentralized trust layer
    - Solana blockchain provides immutable key registry
    - Eliminates need for centralized certificate authorities
+
+6. [SUCCESS] Blockchain prevents all MITM attack attempts
+   - Wallet ownership requirement prevents impersonation
+   - On-chain verification catches key mismatches
+   - All 4 attack strategies fail due to blockchain security
 
 For detailed explanations and code, see individual phase files.
 For visualizations, run: python visualizations/diagram_generator.py

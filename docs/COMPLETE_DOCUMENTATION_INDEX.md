@@ -53,9 +53,16 @@
    - Decentralized verification
    - Blockchain PKI
 
+7. **[PHASE6_DETAILED.md](PHASE6_DETAILED.md)** ✅ **COMPLETE**
+   - Mallory's attacks on blockchain
+   - Attack scenarios and prevention
+   - Blockchain security properties
+   - Wallet ownership requirement
+   - On-chain verification
+
 ### Frontend Documentation
 
-7. **[FRONTEND_DETAILED.md](FRONTEND_DETAILED.md)** ✅ **COMPLETE**
+8. **[FRONTEND_DETAILED.md](FRONTEND_DETAILED.md)** ✅ **COMPLETE**
    - Flask backend architecture
    - API endpoints
    - Frontend JavaScript
@@ -65,16 +72,16 @@
 
 ### Quick Reference
 
-8. **[HOW_TO_RUN.md](HOW_TO_RUN.md)** ✅ **EXISTS**
+9. **[HOW_TO_RUN.md](HOW_TO_RUN.md)** ✅ **EXISTS**
    - Installation instructions
    - Running guide
    - Troubleshooting
 
-9. **[DEMO_GUIDE.md](DEMO_GUIDE.md)** ✅ **EXISTS**
-   - Step-by-step demo guide
-   - Presentation tips
+10. **[DEMO_GUIDE.md](DEMO_GUIDE.md)** ✅ **EXISTS**
+    - Step-by-step demo guide
+    - Presentation tips
 
-10. **[TROUBLESHOOTING.txt](TROUBLESHOOTING.txt)** ✅ **EXISTS**
+11. **[TROUBLESHOOTING.txt](TROUBLESHOOTING.txt)** ✅ **EXISTS**
     - Common problems
     - Solutions
 
@@ -90,7 +97,8 @@
 4. Read **[PHASE3_DETAILED.md](PHASE3_DETAILED.md)** - Understand authentication
 5. Read **[PHASE4_DETAILED.md](PHASE4_DETAILED.md)** - Understand encryption
 6. Read **[PHASE5_DETAILED.md](PHASE5_DETAILED.md)** - Understand blockchain
-7. Read **[FRONTEND_DETAILED.md](FRONTEND_DETAILED.md)** - Understand UI
+7. Read **[PHASE6_DETAILED.md](PHASE6_DETAILED.md)** - Understand blockchain attack prevention
+8. Read **[FRONTEND_DETAILED.md](FRONTEND_DETAILED.md)** - Understand UI
 
 ### For Quick Start
 
@@ -113,6 +121,7 @@
 | PHASE3_DETAILED.md | ✅ Complete | ~18 | 100% |
 | PHASE4_DETAILED.md | ✅ Complete | ~20 | 100% |
 | PHASE5_DETAILED.md | ✅ Complete | ~18 | 100% |
+| PHASE6_DETAILED.md | ✅ Complete | ~18 | 100% |
 | FRONTEND_DETAILED.md | ✅ Complete | ~15 | 100% |
 
 ---
@@ -153,14 +162,21 @@
 - Integrity verification
 - Tampering detection
 
-### PHASE5_DETAILED.md (Planned)
+### PHASE5_DETAILED.md
 - Solana blockchain basics
 - Smart contract explanation
 - Key registry implementation
 - Decentralized verification
 - Blockchain security
 
-### FRONTEND_DETAILED.md (Planned)
+### PHASE6_DETAILED.md
+- Mallory's attack scenarios on blockchain
+- How each attack is prevented
+- Blockchain security properties
+- Wallet ownership requirement
+- On-chain verification mechanism
+
+### FRONTEND_DETAILED.md
 - Flask backend architecture
 - API endpoint design
 - Frontend JavaScript structure

@@ -6,7 +6,8 @@ const phases = [
     { num: 2, title: 'MITM Attack', desc: 'Man-in-the-Middle attack demonstration' },
     { num: 3, title: 'Authenticated DH', desc: 'Digital signatures prevent MITM' },
     { num: 4, title: 'Secure Channel', desc: 'AEAD encryption with ChaCha20-Poly1305' },
-    { num: 5, title: 'Blockchain Integration', desc: 'Solana-based key registry' }
+    { num: 5, title: 'Blockchain Integration', desc: 'Solana-based key registry' },
+    { num: 6, title: 'Blockchain Attack Prevention', desc: 'Mallory attacks blockchain, all prevented' }
 ];
 
 // Charts storage
@@ -121,6 +122,9 @@ function displayPhaseResults(phaseNum, data) {
             break;
         case 5:
             displayPhase5Results(contentDiv, data);
+            break;
+        case 6:
+            displayPhase6Results(contentDiv, data);
             break;
     }
 }
@@ -442,6 +446,89 @@ function displayPhase5Results(div, data) {
     createBlockchainChart('chart-phase5', data.visualization);
 }
 
+function displayPhase6Results(div, data) {
+    const d = data.data;
+    const steps = data.steps || [];
+    const attacks = d.attacks || {};
+    
+    let stepsHtml = '';
+    if (steps.length > 0) {
+        stepsHtml = '<div class="steps-container" style="margin-bottom: 20px;">';
+        steps.forEach((step, idx) => {
+            const isAttack = step.title.includes('ATTACK');
+            const isPrevented = step.title.includes('PREVENTED');
+            const isSuccess = step.title.includes('SUCCESS') || isPrevented;
+            const isFailure = step.title.includes('FAILED') || step.title.includes('SUCCEEDED');
+            stepsHtml += `
+                <div class="step-item" style="margin: 12px 0; padding: 16px; background: ${isSuccess ? 'rgba(76, 175, 80, 0.1)' : isFailure ? 'rgba(244, 67, 54, 0.1)' : isAttack ? 'rgba(244, 67, 54, 0.15)' : 'rgba(255, 255, 255, 0.04)'}; border-radius: 12px; border-left: 3px solid ${isSuccess ? 'rgba(76, 175, 80, 0.7)' : isFailure ? 'rgba(244, 67, 54, 0.7)' : isAttack ? 'rgba(244, 67, 54, 0.7)' : 'rgba(102, 126, 234, 0.5)'};">
+                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                        <span style="background: ${isSuccess ? 'rgba(76, 175, 80, 0.3)' : isFailure ? 'rgba(244, 67, 54, 0.3)' : isAttack ? 'rgba(244, 67, 54, 0.3)' : 'rgba(102, 126, 234, 0.3)'}; color: rgba(255, 255, 255, 0.9); padding: 4px 12px; border-radius: 12px; font-weight: 700; font-size: 0.85em; margin-right: 12px;">Step ${step.step}</span>
+                        <strong style="color: ${isSuccess ? 'rgba(76, 175, 80, 0.95)' : isFailure ? 'rgba(244, 67, 54, 0.95)' : 'rgba(255, 255, 255, 0.95)'}; font-size: 1.05em;">${step.title}</strong>
+                    </div>
+                    <p style="color: rgba(255, 255, 255, 0.8); margin: 8px 0; line-height: 1.5;">${step.description}</p>
+                    ${step.details ? `
+                        <div style="margin-top: 10px; padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 8px; font-size: 0.9em;">
+                            ${Object.entries(step.details).map(([key, value]) => 
+                                `<div style="margin: 4px 0;"><strong style="color: ${isSuccess ? 'rgba(76, 175, 80, 0.9)' : isFailure ? 'rgba(244, 67, 54, 0.9)' : 'rgba(102, 126, 234, 0.9)'};">${key.replace(/_/g, ' ')}:</strong> <span style="color: rgba(255, 255, 255, 0.85);">${typeof value === 'object' ? JSON.stringify(value) : value}</span></div>`
+                            ).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        });
+        stepsHtml += '</div>';
+    }
+    
+    div.innerHTML = `
+        ${stepsHtml}
+        <h3 style="margin: 15px 0; color: rgba(255, 255, 255, 0.95);">Attack Prevention Results</h3>
+        <div class="result-item">
+            <strong>Attack 1 Prevented:</strong> 
+            <span style="color: ${attacks.attack1_prevented ? '#4caf50' : '#f44336'};">
+                ${attacks.attack1_prevented ? '✓ Yes' : '✗ No'}
+            </span>
+        </div>
+        <div class="result-item">
+            <strong>Attack 2 Prevented:</strong> 
+            <span style="color: ${attacks.attack2_prevented ? '#4caf50' : '#f44336'};">
+                ${attacks.attack2_prevented ? '✓ Yes' : '✗ No'}
+            </span>
+        </div>
+        <div class="result-item">
+            <strong>Attack 3 Prevented:</strong> 
+            <span style="color: ${attacks.attack3_prevented ? '#4caf50' : '#f44336'};">
+                ${attacks.attack3_prevented ? '✓ Yes' : '✗ No'}
+            </span>
+        </div>
+        <div class="result-item">
+            <strong>Attack 4 Prevented:</strong> 
+            <span style="color: ${attacks.attack4_prevented ? '#4caf50' : '#f44336'};">
+                ${attacks.attack4_prevented ? '✓ Yes' : '✗ No'}
+            </span>
+        </div>
+        <div class="result-item" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+            <strong>Total Attacks Prevented:</strong> 
+            <span style="color: #4caf50; font-size: 1.2em; font-weight: bold;">
+                ${attacks.total_prevented || 0}/4
+            </span>
+        </div>
+        <div class="chart-container">
+            <canvas id="chart-phase6"></canvas>
+        </div>
+        <div class="summary ${attacks.total_prevented === 4 ? '' : 'error'}">
+            <strong>Result:</strong> ${data.summary}
+        </div>
+    `;
+    
+    // Create attack prevention chart
+    if (data.visualization) {
+        createAttackPreventionChart('chart-phase6', {
+            prevented: attacks.total_prevented || 0,
+            total: 4
+        });
+    }
+}
+
 // Chart creation functions
 function createKeyComparisonChart(canvasId, data) {
     const ctx = document.getElementById(canvasId);
@@ -633,8 +720,53 @@ function createBlockchainChart(canvasId, viz) {
     });
 }
 
+function createAttackPreventionChart(canvasId, data) {
+    const ctx = document.getElementById(canvasId);
+    if (charts[canvasId]) charts[canvasId].destroy();
+    
+    const prevented = data.prevented || 0;
+    const failed = (data.total || 4) - prevented;
+    
+    charts[canvasId] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Attacks Prevented', 'Attacks Succeeded'],
+            datasets: [{
+                label: 'Attack Results',
+                data: [prevented, failed],
+                backgroundColor: ['#4caf50', '#f44336'],
+                borderColor: ['#388e3c', '#d32f2f'],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: `Blockchain Attack Prevention: ${prevented}/${data.total || 4} Prevented`,
+                    color: prevented === (data.total || 4) ? '#4caf50' : '#f44336'
+                },
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: data.total || 4,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+}
+
 async function runAllPhases() {
-    for (let i = 1; i <= 5; i++) {
+    for (let i = 1; i <= 6; i++) {
         await runPhase(i);
         // Small delay between phases
         await new Promise(resolve => setTimeout(resolve, 500));
