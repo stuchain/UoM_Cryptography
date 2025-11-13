@@ -31,7 +31,7 @@ python demo_all_phases.py
 ```
 
 This will:
-- Run all 5 phases sequentially
+- Run all 6 phases sequentially
 - Pause between each phase (press Enter to continue)
 - Show complete output from each phase
 - Display a summary at the end

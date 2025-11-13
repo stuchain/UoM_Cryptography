@@ -43,10 +43,11 @@ This project demonstrates the **complete evolution** of a secure communication c
 ┌───────────────────────────▼─────────────────────────────────┐
 │                    Application Layer                        │
 │  ┌──────────────────────────────────────────────────────┐  │
-│  │  Flask Backend (app.py)                              │  │
+│  │  Flask Backend (backend/app.py)                      │  │
 │  │  - REST API endpoints (/api/phase1-6)                │  │
 │  │  - Orchestrates phase execution                      │  │
 │  │  - Returns JSON with results and visualization data  │  │
+│  │  - Serves frontend files (templates, static)         │  │
 │  └──────────────────────────────────────────────────────┘  │
 └───────────────────────────┬─────────────────────────────────┘
                             │ Python Imports
@@ -102,8 +103,10 @@ secure_channel/
 │   │   └── blockchain_mitm_attack.py # Attack demonstration
 │   └── visualizations/       # Diagram generation utilities
 │
-├── frontend/                  # Web interface
-│   ├── app.py                # Flask backend server
+├── backend/                   # Backend server
+│   └── app.py                # Flask API server
+│
+├── frontend/                  # Frontend files
 │   ├── templates/
 │   │   └── index.html        # Main UI
 │   └── static/
@@ -147,7 +150,7 @@ Each phase is a **standalone Python module** that can be run independently or im
 - **Testability**: Each phase can be tested independently
 - **Educational**: Students can run individual phases to understand each step
 
-### 2. Frontend Backend (frontend/app.py)
+### 2. Backend Server (backend/app.py)
 
 **Flask Application** that serves two purposes:
 
@@ -460,7 +463,7 @@ decrypt_message()  # New function
 
 1. Create `phases/phase6_xxx/` directory
 2. Create `phase6_xxx/implementation.py`
-3. Add API endpoint in `frontend/app.py`:
+3. Add API endpoint in `backend/app.py`:
    ```python
    @app.route('/api/phase6', methods=['POST'])
    def run_phase6():

@@ -45,14 +45,24 @@ else
     echo "[OK] Dependencies already installed"
 fi
 
-# Navigate to frontend directory
+# Check backend and frontend
+if [ ! -d "backend" ]; then
+    echo "[ERROR] backend directory not found!"
+    exit 1
+fi
+
+if [ ! -f "backend/app.py" ]; then
+    echo "[ERROR] app.py not found in backend directory!"
+    exit 1
+fi
+
 if [ ! -d "frontend" ]; then
     echo "[ERROR] frontend directory not found!"
     exit 1
 fi
 
-if [ ! -f "frontend/app.py" ]; then
-    echo "[ERROR] app.py not found in frontend directory!"
+if [ ! -f "frontend/templates/index.html" ]; then
+    echo "[ERROR] index.html not found in frontend/templates directory!"
     exit 1
 fi
 
@@ -81,6 +91,6 @@ elif command -v xdg-open &> /dev/null; then
 fi
 
 # Start the Flask server
-cd frontend
+cd backend
 python3 app.py
 

@@ -17,6 +17,7 @@ This folder contains detailed documentation for the Secure Channel Demo project.
 - **[PHASE3_DETAILED.md](PHASE3_DETAILED.md)** ✅ - Authentication detailed explanation
 - **[PHASE4_DETAILED.md](PHASE4_DETAILED.md)** ✅ - AEAD encryption detailed explanation
 - **[PHASE5_DETAILED.md](PHASE5_DETAILED.md)** ✅ - Blockchain integration detailed explanation
+- **[PHASE6_DETAILED.md](PHASE6_DETAILED.md)** ✅ - Blockchain attack prevention detailed explanation
 
 ### Frontend Documentation
 

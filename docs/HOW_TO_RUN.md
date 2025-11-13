@@ -228,10 +228,10 @@ This runs all phases in order and provides a comprehensive overview.
 
 The interactive web frontend provides a visual interface to test each phase with graphs and detailed step-by-step information.
 
-### Step 1: Navigate to Frontend Directory
+### Step 1: Navigate to Backend Directory
 
 ```bash
-cd frontend
+cd backend
 ```
 
 ### Step 2: Start the Flask Server
@@ -249,7 +249,7 @@ python3 app.py
 You should see output like:
 ```
 ============================================================
-Secure Channel Demo Frontend
+Secure Channel Demo - Backend Server
 ============================================================
 
 Starting Flask server...
@@ -328,7 +328,7 @@ Press `Ctrl+C` in the terminal to stop the Flask server.
   - **Windows:** `netstat -ano | findstr :5000`
   - **macOS/Linux:** `lsof -i :5000`
 - Kill the process or use a different port
-- To use a different port, edit `frontend/app.py` and change `port=5000` to another number (e.g., `port=5001`)
+- To use a different port, edit `backend/app.py` and change `port=5000` to another number (e.g., `port=5001`)
 
 ### Problem: `localhost refused to connect`
 
@@ -387,8 +387,8 @@ For a quick start without reading everything:
    ```
 5. **Run frontend:**
    ```bash
-   cd frontend
-   python app.py
+cd backend
+python app.py
    ```
 6. **Open browser:** `http://localhost:5000`
 

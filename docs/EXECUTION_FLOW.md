@@ -26,7 +26,7 @@ When you run the application, here's what happens:
    ↓
 3. scripts/run.bat checks Python, installs dependencies
    ↓
-4. scripts/run.bat starts frontend/app.py
+4. scripts/run.bat starts backend/app.py
    ↓
 5. Flask server starts on port 5000
    ↓
@@ -98,22 +98,27 @@ if errorlevel 1 (
 - If not, installs all dependencies from `requirements.txt`
 - Installs: `flask`, `flask-cors`, `cryptography`, etc.
 
-#### 2.4: Check Frontend
+#### 2.4: Check Backend and Frontend
 ```batch
-if not exist "frontend\app.py" (
+if not exist "backend\app.py" (
+    echo ERROR: Backend not found!
+    exit
+)
+if not exist "frontend\templates\index.html" (
     echo ERROR: Frontend not found!
     exit
 )
 ```
-- Verifies `frontend/app.py` exists
+- Verifies `backend/app.py` exists
+- Verifies `frontend/templates/index.html` exists
 - **If fails:** Shows error and exits
 
 #### 2.5: Start Flask Server
 ```batch
-cd frontend
+cd backend
 python app.py
 ```
-- Changes to `frontend/` directory
+- Changes to `backend/` directory
 - Starts Flask application
 - Server runs on `http://localhost:5000`
 
@@ -129,7 +134,7 @@ start http://localhost:5000
 
 ### Step 3: Flask Server Initialization
 
-**File:** `frontend/app.py`
+**File:** `backend/app.py`
 
 **What happens:**
 
@@ -143,9 +148,11 @@ import os
 
 #### 3.2: Setup Flask App
 ```python
+# Flask app with paths pointing to frontend folder
+frontend_dir = os.path.join(project_root, 'frontend')
 app = Flask(__name__, 
-            template_folder='templates',
-            static_folder='static')
+            template_folder=os.path.join(frontend_dir, 'templates'),
+            static_folder=os.path.join(frontend_dir, 'static'))
 CORS(app)  # Enable CORS for frontend-backend communication
 ```
 
@@ -180,10 +187,10 @@ if __name__ == '__main__':
 **What happens:**
 
 1. Browser requests `http://localhost:5000/`
-2. Flask serves `frontend/templates/index.html`
+2. Flask (from `backend/app.py`) serves `frontend/templates/index.html`
 3. HTML loads:
-   - CSS styles (`static/style.css`)
-   - JavaScript (`static/main.js`)
+   - CSS styles (`frontend/static/style.css`)
+   - JavaScript (`frontend/static/main.js`)
    - Chart.js library (from CDN)
 4. JavaScript initializes:
    - Creates phase cards
@@ -228,7 +235,7 @@ function runPhase(phaseNum) {
 - **Body:** Empty (no data needed)
 
 #### 3. Flask Receives Request
-**File:** `frontend/app.py`
+**File:** `backend/app.py`
 
 ```python
 @app.route('/api/phase1', methods=['POST'])
@@ -245,6 +252,8 @@ def run_phase1():
 ## ⚙️ Phase Execution Flow
 
 ### Detailed Flow for Phase 1
+
+**File:** `backend/app.py`
 
 #### Step 1: Flask Route Handler
 ```python
@@ -328,7 +337,7 @@ displayPhase1Results(contentDiv, data);
 │  1. Check Python installation                                │
 │  2. Check project files                                      │
 │  3. Install dependencies (if needed)                         │
-│  4. Check frontend/app.py                                    │
+│  4. Check backend/app.py and frontend/templates/              │
 │  5. Start Flask server                                       │
 │  6. Open browser                                             │
 └───────────────────────┬─────────────────────────────────────┘
@@ -424,7 +433,7 @@ displayPhase1Results(contentDiv, data);
    - Installs dependencies
    - Starts Flask
 
-3. **`frontend/app.py`**
+3. **`backend/app.py`**
    - Flask server
    - Defines routes
    - Starts HTTP server
@@ -447,7 +456,7 @@ When user clicks "Phase 1":
    - `runPhase(1)` function
    - Sends HTTP request
 
-2. **`frontend/app.py`**
+2. **`backend/app.py`**
    - `@app.route('/api/phase1')`
    - `run_phase1()` function
 
@@ -456,7 +465,7 @@ When user clicks "Phase 1":
    - `public_bytes()`
    - `derive_shared_key()`
 
-4. **`frontend/app.py`**
+4. **`backend/app.py`**
    - Formats results
    - Returns JSON
 

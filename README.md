@@ -41,8 +41,10 @@ secure_channel/
 │   ├── phase6_blockchain_attack/  # Blockchain attack prevention
 │   └── visualizations/     # Diagram generators
 │
-├── frontend/               # Web interface
-│   ├── app.py             # Flask backend
+├── backend/               # Backend server
+│   └── app.py            # Flask API server
+│
+├── frontend/              # Frontend files
 │   ├── templates/         # HTML templates
 │   └── static/            # CSS & JavaScript
 │
@@ -85,7 +87,7 @@ The launcher script (`run.bat` or `scripts/run.sh`) will automatically:
 ### Manual Setup
 ```bash
 pip install -r requirements.txt
-cd frontend
+cd backend
 python app.py
 ```
 
@@ -155,7 +157,7 @@ By exploring this project, you will understand:
 
 **Port 5000 in use:**
 - Close other applications using port 5000
-- Or edit `frontend/app.py` and change the port number
+- Or edit `backend/app.py` and change the port number
 
 **Dependencies not installing:**
 - Check internet connection

@@ -11,18 +11,18 @@ Interactive web-based frontend for demonstrating all phases of the secure channe
 pip install -r requirements.txt
 ```
 
-### 2. Run the Frontend Server
+### 2. Run the Backend Server
 
 ```bash
 # From project root
-cd frontend
+cd backend
 python app.py
 ```
 
 Or from project root:
 
 ```bash
-python frontend/app.py
+python backend/app.py
 ```
 
 ### 3. Open in Browser
@@ -110,7 +110,7 @@ frontend/
 ### Port Already in Use
 If port 5000 is already in use:
 ```python
-# Edit frontend/app.py, change:
+# Edit backend/app.py, change:
 app.run(debug=True, host='0.0.0.0', port=5000)
 # To:
 app.run(debug=True, host='0.0.0.0', port=5001)
@@ -120,7 +120,7 @@ app.run(debug=True, host='0.0.0.0', port=5001)
 Make sure you're running from the project root:
 ```bash
 cd secure_channel
-python frontend/app.py
+python backend/app.py
 ```
 
 ### Charts Not Displaying
@@ -156,7 +156,7 @@ Edit `frontend/static/main.js` and add new chart functions.
 Edit `frontend/templates/index.html` (inline styles) or `frontend/static/style.css`.
 
 ### Adding New Phases
-1. Add endpoint in `frontend/app.py` (`/api/phase6`)
+1. Add endpoint in `backend/app.py` (`/api/phase6`)
 2. Add button in `frontend/templates/index.html`
 3. Add display function in `frontend/static/main.js`
 

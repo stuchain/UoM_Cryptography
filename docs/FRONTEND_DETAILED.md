@@ -46,16 +46,17 @@ The frontend provides an **interactive web interface** that:
 ```
 Browser (Client)
     │
-    ├─► HTML/CSS (UI)
-    ├─► JavaScript (Logic)
+    ├─► HTML/CSS (UI) - from frontend/
+    ├─► JavaScript (Logic) - from frontend/
     └─► Chart.js (Visualizations)
          │
          │ HTTP Requests
          ▼
-Flask Server (Backend)
+Flask Server (backend/app.py)
     │
     ├─► REST API Endpoints
     ├─► Phase Execution
+    ├─► Serves frontend files
     └─► JSON Responses
          │
          │ Python Imports
@@ -66,7 +67,8 @@ Phase Modules (phases/)
     ├─► Phase 2: MITM Attack
     ├─► Phase 3: Authenticated DH
     ├─► Phase 4: Secure Channel
-    └─► Phase 5: Blockchain
+    ├─► Phase 5: Blockchain
+    └─► Phase 6: Blockchain Attack
 ```
 
 ### Request-Response Flow
@@ -101,7 +103,7 @@ Phase Modules (phases/)
 
 ---
 
-## 🐍 Flask Backend (app.py)
+## 🐍 Flask Backend (backend/app.py)
 
 ### Application Setup
 

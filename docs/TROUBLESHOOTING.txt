@@ -36,7 +36,7 @@ SOLUTION 5: Manual run
 2. Type these commands one by one:
    
    python -m pip install -r requirements.txt
-   cd frontend
+   cd backend
    python app.py
 
 3. Then open browser to: http://localhost:5000
@@ -83,7 +83,7 @@ PROBLEM: Port 5000 already in use
 ----------------------------------
 
 1. Close any other programs using port 5000
-2. Or edit frontend/app.py and change port=5000 to port=5001
+2. Or edit backend/app.py and change port=5000 to port=5001
 3. Then open browser to: http://localhost:5001
 
 ============================================================

@@ -17,9 +17,11 @@ import traceback
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 
+# Flask app with paths pointing to frontend folder (one level up from backend)
+frontend_dir = os.path.join(project_root, 'frontend')
 app = Flask(__name__, 
-            template_folder='templates',
-            static_folder='static')
+            template_folder=os.path.join(frontend_dir, 'templates'),
+            static_folder=os.path.join(frontend_dir, 'static'))
 CORS(app)  # Enable CORS for frontend-backend communication
 
 # Import phase modules
@@ -1304,7 +1306,7 @@ def run_all_phases():
 
 if __name__ == '__main__':
     print("=" * 60)
-    print("Secure Channel Demo Frontend")
+    print("Secure Channel Demo - Backend Server")
     print("=" * 60)
     print("\nStarting Flask server...")
     print("Open your browser to: http://localhost:5000")

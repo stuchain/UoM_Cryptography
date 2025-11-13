@@ -534,13 +534,18 @@ function createKeyComparisonChart(canvasId, data) {
     const ctx = document.getElementById(canvasId);
     if (charts[canvasId]) charts[canvasId].destroy();
     
+    // Convert hex strings to numeric values for visualization
+    // Take first 8 hex chars (4 bytes) and convert to number
+    const aliceValue = parseInt(data.alice.replace(/[^0-9a-f]/gi, '').substring(0, 8) || '0', 16);
+    const bobValue = parseInt(data.bob.replace(/[^0-9a-f]/gi, '').substring(0, 8) || '0', 16);
+    
     charts[canvasId] = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: ['Alice', 'Bob'],
             datasets: [{
-                label: 'Shared Key (first 16 bytes)',
-                data: [data.alice, data.bob],
+                label: 'Shared Key (numeric representation)',
+                data: [aliceValue, bobValue],
                 backgroundColor: data.match ? ['#4caf50', '#4caf50'] : ['#f44336', '#f44336'],
                 borderColor: data.match ? ['#388e3c', '#388e3c'] : ['#d32f2f', '#d32f2f'],
                 borderWidth: 2
@@ -550,16 +555,49 @@ function createKeyComparisonChart(canvasId, data) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false },
+                legend: { 
+                    display: false 
+                },
                 title: {
                     display: true,
                     text: data.match ? 'Keys Match ✓' : 'Keys Differ ✗',
-                    color: data.match ? '#4caf50' : '#f44336'
+                    color: data.match ? '#4caf50' : '#f44336',
+                    font: {
+                        size: 16,
+                        weight: 'bold'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                    borderWidth: 1
                 }
             },
             scales: {
+                x: {
+                    ticks: {
+                        color: '#ffffff',
+                        font: {
+                            size: 12
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                },
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#ffffff',
+                        font: {
+                            size: 12
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
                 }
             }
         }
@@ -570,13 +608,24 @@ function createMITMChart(canvasId, keys) {
     const ctx = document.getElementById(canvasId);
     if (charts[canvasId]) charts[canvasId].destroy();
     
+    // Convert hex strings to numeric values for visualization
+    const hexToNum = (hexStr) => {
+        const cleanHex = (hexStr || '').replace(/[^0-9a-f]/gi, '').substring(0, 8) || '0';
+        return parseInt(cleanHex, 16);
+    };
+    
     charts[canvasId] = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: ['Alice', 'Bob', 'Mallory↔Alice', 'Mallory↔Bob'],
             datasets: [{
-                label: 'Keys (first 16 bytes)',
-                data: [keys.alice, keys.bob, keys.mallory_alice, keys.mallory_bob],
+                label: 'Keys (numeric representation)',
+                data: [
+                    hexToNum(keys.alice),
+                    hexToNum(keys.bob),
+                    hexToNum(keys.mallory_alice),
+                    hexToNum(keys.mallory_bob)
+                ],
                 backgroundColor: ['#f44336', '#f44336', '#ff9800', '#ff9800'],
                 borderColor: ['#d32f2f', '#d32f2f', '#f57c00', '#f57c00'],
                 borderWidth: 2
@@ -586,11 +635,49 @@ function createMITMChart(canvasId, keys) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false },
+                legend: { 
+                    display: false 
+                },
                 title: {
                     display: true,
                     text: 'MITM Attack: Alice and Bob Have Different Keys',
-                    color: '#f44336'
+                    color: '#f44336',
+                    font: {
+                        size: 16,
+                        weight: 'bold'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                    borderWidth: 1
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: '#ffffff',
+                        font: {
+                            size: 12
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#ffffff',
+                        font: {
+                            size: 12
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
                 }
             }
         }
@@ -622,10 +709,29 @@ function createAuthenticationChart(canvasId, viz) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
+                legend: {
+                    labels: {
+                        color: '#ffffff',
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
                 title: {
                     display: true,
                     text: 'Authentication Status',
-                    color: '#667eea'
+                    color: '#667eea',
+                    font: {
+                        size: 16,
+                        weight: 'bold'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                    borderWidth: 1
                 }
             }
         }
@@ -656,15 +762,54 @@ function createEncryptionChart(canvasId, viz) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
+                legend: {
+                    labels: {
+                        color: '#ffffff',
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
                 title: {
                     display: true,
                     text: 'Message Encryption Overhead',
-                    color: '#667eea'
+                    color: '#667eea',
+                    font: {
+                        size: 16,
+                        weight: 'bold'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                    borderWidth: 1
                 }
             },
             scales: {
+                x: {
+                    ticks: {
+                        color: '#ffffff',
+                        font: {
+                            size: 12
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                },
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#ffffff',
+                        font: {
+                            size: 12
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
                 }
             }
         }
@@ -703,16 +848,47 @@ function createBlockchainChart(canvasId, viz) {
                 title: {
                     display: true,
                     text: 'Blockchain Key Verification',
-                    color: '#667eea'
+                    color: '#667eea',
+                    font: {
+                        size: 16,
+                        weight: 'bold'
+                    }
                 },
-                legend: { display: false }
+                legend: { 
+                    display: false 
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                    borderWidth: 1
+                }
             },
             scales: {
+                x: {
+                    ticks: {
+                        color: '#ffffff',
+                        font: {
+                            size: 12
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                },
                 y: {
                     beginAtZero: true,
                     max: 1,
                     ticks: {
-                        stepSize: 1
+                        stepSize: 1,
+                        color: '#ffffff',
+                        font: {
+                            size: 12
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
                     }
                 }
             }
@@ -746,18 +922,47 @@ function createAttackPreventionChart(canvasId, data) {
                 title: {
                     display: true,
                     text: `Blockchain Attack Prevention: ${prevented}/${data.total || 4} Prevented`,
-                    color: prevented === (data.total || 4) ? '#4caf50' : '#f44336'
+                    color: prevented === (data.total || 4) ? '#4caf50' : '#f44336',
+                    font: {
+                        size: 16,
+                        weight: 'bold'
+                    }
                 },
                 legend: {
                     display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                    borderWidth: 1
                 }
             },
             scales: {
+                x: {
+                    ticks: {
+                        color: '#ffffff',
+                        font: {
+                            size: 12
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                },
                 y: {
                     beginAtZero: true,
                     max: data.total || 4,
                     ticks: {
-                        stepSize: 1
+                        stepSize: 1,
+                        color: '#ffffff',
+                        font: {
+                            size: 12
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
                     }
                 }
             }

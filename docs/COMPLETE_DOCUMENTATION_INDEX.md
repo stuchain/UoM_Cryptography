@@ -79,18 +79,24 @@
    - File execution order
    - Request-response flow
 
+10. **[FRONTEND_BACKEND_EXPLANATION.md](FRONTEND_BACKEND_EXPLANATION.md)** ✅ **COMPLETE**
+    - Explains frontend vs backend terminology
+    - Why Flask serves two roles
+    - How web server and API server work together
+    - Clear separation of concerns
+
 ### Quick Reference
 
-10. **[HOW_TO_RUN.md](HOW_TO_RUN.md)** ✅ **EXISTS**
+11. **[HOW_TO_RUN.md](HOW_TO_RUN.md)** ✅ **EXISTS**
     - Installation instructions
     - Running guide
     - Troubleshooting
 
-11. **[DEMO_GUIDE.md](DEMO_GUIDE.md)** ✅ **EXISTS**
+12. **[DEMO_GUIDE.md](DEMO_GUIDE.md)** ✅ **EXISTS**
     - Step-by-step demo guide
     - Presentation tips
 
-12. **[TROUBLESHOOTING.txt](TROUBLESHOOTING.txt)** ✅ **EXISTS**
+13. **[TROUBLESHOOTING.txt](TROUBLESHOOTING.txt)** ✅ **EXISTS**
     - Common problems
     - Solutions
 

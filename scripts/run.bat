@@ -93,22 +93,35 @@ if errorlevel 1 (
 )
 echo.
 
-REM Check frontend
-echo [4/5] Checking frontend...
-if not exist "frontend\app.py" (
+REM Check backend and frontend
+echo [4/5] Checking backend and frontend...
+if not exist "backend\app.py" (
+    cls
+    echo.
+    echo ============================================================
+    echo ERROR: Backend not found!
+    echo ============================================================
+    echo.
+    echo Cannot find backend\app.py
+    echo.
+    echo Press any key to exit...
+    pause >nul
+    exit /b 1
+)
+if not exist "frontend\templates\index.html" (
     cls
     echo.
     echo ============================================================
     echo ERROR: Frontend not found!
     echo ============================================================
     echo.
-    echo Cannot find frontend\app.py
+    echo Cannot find frontend\templates\index.html
     echo.
     echo Press any key to exit...
     pause >nul
     exit /b 1
 )
-echo [OK] Frontend found!
+echo [OK] Backend and frontend found!
 echo.
 
 REM Start server
@@ -132,7 +145,7 @@ timeout /t 2 /nobreak >nul
 start http://localhost:5000
 
 REM Start Flask
-cd frontend
+cd backend
 python app.py
 
 REM If server stops
