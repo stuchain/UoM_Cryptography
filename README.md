@@ -1,6 +1,6 @@
 # 🔐 Mini Secure Channel (Solana Edition)
 
-**Cryptography Course Assignment - AUEB MSc**  
+**Cryptography Course Assignment - University of Macedonia**  
 **Due: January 5, 2026 | Presentation: January 9, 2026**
 
 A comprehensive implementation demonstrating the construction, analysis, and hardening of a secure communication channel, integrated with Solana blockchain for decentralized key verification.
@@ -22,13 +22,15 @@ A comprehensive implementation demonstrating the construction, analysis, and har
 
 ## 🎯 Project Overview
 
-This project demonstrates the step-by-step construction of a secure communication channel:
+This project demonstrates the step-by-step construction of a secure communication channel, showing both the vulnerabilities and the solutions in modern cryptography. The project is structured as a progressive learning experience, where each phase builds upon the previous one, revealing the evolution from a basic key exchange to a fully secure communication channel.
 
-1. **Basic Diffie-Hellman Key Exchange** (X25519)
-2. **MITM Attack Demonstration** - Shows vulnerabilities in unauthenticated protocols
+### What This Project Demonstrates
+
+1. **Basic Diffie-Hellman Key Exchange** (X25519) - The foundation of secure key establishment
+2. **MITM Attack Demonstration** - Shows how unauthenticated protocols can be compromised
 3. **Authentication** - Adds Ed25519 signatures to prevent MITM attacks
-4. **AEAD Encryption** - Implements ChaCha20-Poly1305 for secure messaging
-5. **Blockchain Integration** - Solana-based decentralized key registry
+4. **AEAD Encryption** - Implements ChaCha20-Poly1305 for secure messaging with integrity
+5. **Blockchain Integration** - Solana-based decentralized key registry for trustless PKI
 
 ### Learning Objectives
 
@@ -38,6 +40,7 @@ By completing this project, students will:
 - Implement and use AEAD schemes correctly
 - Explore blockchain as a decentralized trust layer for PKI
 - Connect classical cryptography with modern Web3 infrastructure
+- See real-world attacks and their mitigations in action
 
 ---
 
@@ -74,10 +77,40 @@ secure_channel/
 
 **File**: `phase2_dh/dh_exchange.py`
 
-Demonstrates a minimal Diffie-Hellman key exchange using X25519 (Curve25519):
-- Key pair generation (X25519)
-- Public key exchange
-- Shared secret derivation via HKDF-SHA256
+#### What Happens in This Phase
+
+This phase demonstrates the fundamental problem of secure key exchange: how can two parties (Alice and Bob) establish a shared secret key over an insecure channel without ever meeting?
+
+**Step-by-Step Process:**
+
+1. **Key Generation**: 
+   - Alice generates a private key `a` (random 32 bytes) and computes her public key `A = a * G` (where G is the generator point on Curve25519)
+   - Bob generates a private key `b` (random 32 bytes) and computes his public key `B = b * G`
+   - These are X25519 key pairs, using the elliptic curve Curve25519
+
+2. **Public Key Exchange**:
+   - Alice sends her public key `A` to Bob (this can be intercepted by attackers)
+   - Bob sends his public key `B` to Alice (this can also be intercepted)
+
+3. **Shared Secret Derivation**:
+   - Alice computes: `shared_secret = a * B = a * (b * G) = ab * G`
+   - Bob computes: `shared_secret = b * A = b * (a * G) = ab * G`
+   - Both arrive at the same value due to the commutative property of elliptic curve scalar multiplication
+
+4. **Key Derivation (HKDF)**:
+   - The raw shared secret is passed through HKDF-SHA256 (HMAC-based Key Derivation Function)
+   - This ensures the final key is uniformly random and cryptographically strong
+   - HKDF uses SHA-256 as the underlying hash function
+
+**Why This Matters:**
+- Demonstrates the mathematical beauty of Diffie-Hellman: two parties can agree on a secret without ever transmitting it
+- Shows that public keys can be safely transmitted (they don't reveal the private keys)
+- However, this phase is **vulnerable** - there's no authentication, so an attacker can intercept and replace keys
+
+**Cryptographic Concepts:**
+- **X25519**: Elliptic curve Diffie-Hellman on Curve25519, providing 128-bit security
+- **HKDF**: Key derivation function that transforms a shared secret into a usable symmetric key
+- **Forward Secrecy**: Each key exchange uses new ephemeral keys, so compromise of long-term keys doesn't affect past sessions
 
 **Run**:
 ```bash
@@ -90,10 +123,48 @@ python phase2_dh/dh_exchange.py
 
 **File**: `phase3_mitm/mallory_attack.py`
 
-Simulates a Man-in-the-Middle attack on the unauthenticated DH exchange:
-- Mallory intercepts and replaces public keys
-- Demonstrates how both Alice and Bob unknowingly share keys with Mallory
-- Shows the vulnerability of unauthenticated key exchange
+#### What Happens in This Phase
+
+This phase demonstrates a **Man-in-the-Middle (MITM) attack**, showing how an attacker (Mallory) can completely compromise the key exchange from Phase 1. This is the critical vulnerability that motivates all subsequent security improvements.
+
+**The Attack Scenario:**
+
+1. **Mallory's Setup**:
+   - Mallory generates two key pairs: one to impersonate Bob to Alice, and one to impersonate Alice to Bob
+   - Mallory positions herself between Alice and Bob in the network
+
+2. **Interception and Replacement**:
+   - When Alice sends her public key `A` to Bob, Mallory intercepts it
+   - Mallory replaces it with her own public key `M_B` (pretending to be Bob)
+   - When Bob sends his public key `B` to Alice, Mallory intercepts it
+   - Mallory replaces it with her own public key `M_A` (pretending to be Alice)
+
+3. **The Compromise**:
+   - Alice thinks she's establishing a key with Bob, but actually establishes a key with Mallory: `K_Alice = a * M_B`
+   - Bob thinks he's establishing a key with Alice, but actually establishes a key with Mallory: `K_Bob = b * M_A`
+   - Mallory knows both keys: `K_Alice` and `K_Bob`
+
+4. **The Consequences**:
+   - Any message Alice sends (encrypted with `K_Alice`) can be decrypted by Mallory
+   - Mallory can decrypt, read, modify, and re-encrypt messages before forwarding them
+   - Bob receives messages that appear to be from Alice, but Mallory has full control
+   - Neither Alice nor Bob knows they're being attacked
+
+**Why This Attack Works:**
+- There's no authentication - Alice and Bob have no way to verify they're talking to each other
+- Public keys are just numbers - there's no proof of identity attached
+- The attack is completely transparent to the victims
+
+**What You'll See:**
+- Alice and Bob both successfully derive keys (they think everything is fine)
+- Mallory also derives both keys (she can decrypt everything)
+- The keys don't match between Alice and Bob (they're talking to Mallory, not each other)
+- Demonstration of message interception and decryption
+
+**Cryptographic Concepts:**
+- **MITM Attack**: A fundamental attack on unauthenticated key exchange protocols
+- **Authentication Gap**: The missing piece that makes Phase 1 vulnerable
+- **Trust Problem**: How do you know who you're talking to over an insecure channel?
 
 **Run**:
 ```bash
@@ -106,10 +177,60 @@ python phase3_mitm/mallory_attack.py
 
 **File**: `phase4_auth/authenticated_dh.py`
 
-Fixes the MITM vulnerability by adding Ed25519 digital signatures:
-- Each participant signs their DH public key with Ed25519
-- Receivers verify signatures before accepting keys
-- Mallory cannot forge signatures without private keys
+#### What Happens in This Phase
+
+This phase fixes the critical vulnerability from Phase 2 by adding **digital signatures** for authentication. Now Alice and Bob can verify that they're actually talking to each other, not to Mallory.
+
+**The Solution: Dual Keypair System**
+
+Each participant now has **two** key pairs:
+1. **X25519 key pair** (for Diffie-Hellman key exchange) - ephemeral, changes each session
+2. **Ed25519 key pair** (for signing) - long-term, represents identity
+
+**Step-by-Step Process:**
+
+1. **Long-Term Identity Setup**:
+   - Alice generates an Ed25519 signing key pair: `(signing_priv_A, signing_pub_A)`
+   - Bob generates an Ed25519 signing key pair: `(signing_priv_B, signing_pub_B)`
+   - These public keys represent their identities (like a username or certificate)
+
+2. **Key Exchange with Authentication**:
+   - Alice generates a new X25519 key pair for this session: `(dh_priv_A, dh_pub_A)`
+   - Alice signs her DH public key: `signature_A = Sign(signing_priv_A, dh_pub_A)`
+   - Alice sends to Bob: `(dh_pub_A, signing_pub_A, signature_A)`
+   
+   - Bob receives the message and verifies:
+     - `Verify(signing_pub_A, signature_A, dh_pub_A)` - checks if the signature is valid
+     - If valid, Bob knows this DH public key really came from Alice
+     - Bob then derives the shared key: `K = b * dh_pub_A`
+
+3. **Symmetric Process for Bob**:
+   - Bob does the same: generates DH key pair, signs it, sends to Alice
+   - Alice verifies Bob's signature before accepting his DH public key
+
+4. **Mallory's Failure**:
+   - Mallory can still intercept messages
+   - But when she tries to replace Alice's DH public key with her own:
+     - Mallory can't create a valid signature from Alice's signing key (she doesn't have `signing_priv_A`)
+     - Bob verifies the signature and detects the forgery
+     - Bob rejects the key exchange
+   - The attack fails!
+
+**Why This Works:**
+- **Digital Signatures**: Provide cryptographic proof of identity
+- **Non-repudiation**: Alice can't deny sending the message (only she has the private key)
+- **Integrity**: Any modification to the signed data invalidates the signature
+- **Authentication**: Bob can be certain the DH public key came from Alice
+
+**Cryptographic Concepts:**
+- **Ed25519**: Elliptic curve digital signature algorithm, providing 128-bit security
+- **Signature Scheme**: Uses the EdDSA (Edwards-curve Digital Signature Algorithm) construction
+- **Public Key Infrastructure (PKI)**: The signing public keys need to be distributed securely (this is where Phase 6/blockchain helps)
+
+**What You'll See:**
+- Successful authenticated key exchange between Alice and Bob
+- Mallory's attack attempt fails - signatures don't verify
+- Demonstration that authentication prevents MITM attacks
 
 **Run**:
 ```bash
@@ -122,11 +243,70 @@ python phase4_auth/authenticated_dh.py
 
 **File**: `phase5_aead/secure_channel.py`
 
-Complete secure channel implementation:
-- Authenticated DH key exchange
-- ChaCha20-Poly1305 AEAD encryption
-- Message confidentiality, integrity, and authentication
-- Tampering detection
+#### What Happens in This Phase
+
+This phase completes the secure channel by adding **Authenticated Encryption with Associated Data (AEAD)**. Now we can not only establish a secure key, but also send encrypted messages with guaranteed confidentiality, integrity, and authentication.
+
+**What is AEAD?**
+
+AEAD provides three security properties in one operation:
+1. **Confidentiality**: Messages are encrypted (only the key holder can read them)
+2. **Integrity**: Any tampering is detected (the message is verified to be unmodified)
+3. **Authentication**: The message is verified to come from the key holder
+
+**The Complete Secure Channel:**
+
+1. **Key Establishment** (from Phase 3):
+   - Alice and Bob perform authenticated Diffie-Hellman key exchange
+   - They derive a shared symmetric key `K`
+
+2. **Message Encryption (Alice → Bob)**:
+   - Alice wants to send message `M`
+   - Generate a unique **nonce** (number used once): `nonce = counter + random_bytes`
+   - Encrypt with ChaCha20-Poly1305: `(ciphertext, tag) = Encrypt(K, nonce, M, associated_data)`
+     - **ChaCha20**: Stream cipher that encrypts the message
+     - **Poly1305**: MAC (Message Authentication Code) that authenticates the ciphertext
+     - **Associated Data**: Optional data that's authenticated but not encrypted (like headers)
+   - Send: `(nonce, ciphertext)`
+
+3. **Message Decryption (Bob receives)**:
+   - Bob receives `(nonce, ciphertext)`
+   - Decrypt and verify: `M = Decrypt(K, nonce, ciphertext, associated_data)`
+   - The decryption process automatically:
+     - Verifies the Poly1305 tag (detects tampering)
+     - Decrypts the ChaCha20 ciphertext
+     - Returns the plaintext only if verification succeeds
+
+4. **Tampering Detection**:
+   - If Mallory modifies the ciphertext in transit
+   - Bob's decryption will fail with `InvalidTag` exception
+   - The message is rejected - tampering is detected!
+
+**Why ChaCha20-Poly1305?**
+
+- **Fast**: Optimized for software, performs well on CPUs without hardware acceleration
+- **Secure**: Designed by Daniel J. Bernstein, widely analyzed and trusted
+- **Standardized**: RFC 8439, used in TLS 1.3, WireGuard, and many modern protocols
+- **AEAD**: Provides all three security properties in one operation
+
+**Nonce Management:**
+
+- Each message must use a unique nonce
+- Nonces are never reused with the same key
+- This implementation uses: `nonce = 8-byte-counter || 4-byte-random`
+- The counter ensures uniqueness, random bytes add extra security
+
+**Cryptographic Concepts:**
+- **AEAD**: Authenticated Encryption with Associated Data
+- **ChaCha20**: Stream cipher based on the ChaCha stream cipher
+- **Poly1305**: One-time authenticator (MAC) based on polynomial evaluation
+- **Nonce**: Number used once - critical for security (reuse breaks security)
+- **Tag/MAC**: Cryptographic checksum that proves authenticity and integrity
+
+**What You'll See:**
+- Successful encrypted message transmission
+- Demonstration of tampering detection (modified messages are rejected)
+- Complete secure channel: authentication + encryption + integrity
 
 **Run**:
 ```bash
@@ -139,10 +319,72 @@ python phase5_aead/secure_channel.py
 
 **File**: `phase6_solana/solana_registry_client.py`
 
-Solana blockchain integration for decentralized key verification:
-- Smart contract (Anchor) for on-chain key registry
-- Python client to register and verify public keys
-- Decentralized PKI model
+#### What Happens in This Phase
+
+This phase addresses a critical question from Phase 3: **How do Alice and Bob know each other's signing public keys?** Traditional PKI uses Certificate Authorities (CAs), but blockchain provides a decentralized alternative.
+
+**The Problem: Key Distribution**
+
+In Phase 3, we assumed Alice and Bob already know each other's Ed25519 signing public keys. But in reality:
+- How does Alice get Bob's signing public key securely?
+- How does Bob know Alice's signing public key is authentic?
+- What if Mallory creates a fake key pair and claims to be Alice?
+
+**The Blockchain Solution:**
+
+Instead of trusting a central Certificate Authority, we use the Solana blockchain as a **decentralized, immutable key registry**.
+
+**How It Works:**
+
+1. **Key Registration**:
+   - Alice generates her Ed25519 signing key pair
+   - Alice creates a Solana transaction that stores her public key on-chain
+   - The transaction is signed with Alice's Solana wallet (proving ownership)
+   - Once confirmed, Alice's public key is permanently recorded on the blockchain
+
+2. **Key Lookup**:
+   - Bob wants to communicate with Alice
+   - Bob queries the Solana blockchain for Alice's registered public key
+   - Bob retrieves the on-chain public key
+   - Bob uses this public key to verify Alice's signatures in Phase 3
+
+3. **Trust Model**:
+   - **No central authority**: The blockchain is decentralized
+   - **Immutable**: Once registered, keys can't be retrospectively modified
+   - **Transparent**: Anyone can verify what keys are registered
+   - **Cryptographic proof**: The blockchain itself provides cryptographic guarantees
+
+**Smart Contract Details:**
+
+The Solana program (smart contract) provides:
+- `register_key`: Store a public key associated with a user's wallet address
+- `get_key`: Retrieve a registered public key for a given wallet address
+- **Account structure**: Stores the Ed25519 public key in a Solana account
+
+**Integration with Previous Phases:**
+
+1. **Before Phase 3**: Alice and Bob register their Ed25519 signing public keys on Solana
+2. **During Phase 3**: When Alice sends her signing public key to Bob, Bob can verify it matches the on-chain registry
+3. **Attack Prevention**: Mallory can't register a key as Alice (she doesn't control Alice's Solana wallet)
+
+**Why Blockchain for PKI?**
+
+- **Decentralization**: No single point of failure or trust
+- **Immutability**: Historical record of all key registrations
+- **Transparency**: Public verification of key ownership
+- **No CAs**: Eliminates the need for trusted third parties
+- **Web3 Native**: Aligns with decentralized identity trends
+
+**Cryptographic Concepts:**
+- **Decentralized PKI**: Public key infrastructure without central authorities
+- **Blockchain Registry**: Using blockchain as an immutable database
+- **Wallet-based Identity**: Solana wallet addresses serve as identifiers
+- **On-chain Verification**: Cryptographic proofs stored on blockchain
+
+**What You'll See:**
+- Key registration on Solana (simulated or real devnet)
+- Key lookup and verification
+- Integration with the authenticated key exchange from Phase 3
 
 **Run**:
 ```bash
@@ -160,20 +402,27 @@ anchor deploy
 
 ## 💻 Installation
 
-### Prerequisites
+**📖 For detailed installation and running instructions, see [HOW_TO_RUN.md](HOW_TO_RUN.md)**
 
-- Python 3.10+
-- Rust (for Solana smart contracts)
-- Solana CLI tools
-- Anchor Framework (for Solana development)
+### Quick Start
 
-### Python Dependencies
+1. **Prerequisites**: Python 3.10+
+2. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **Run the interactive frontend**:
+   ```bash
+   cd frontend
+   python app.py
+   ```
+4. **Open browser**: `http://localhost:5000`
 
-```bash
-pip install -r requirements.txt
-```
+### Full Installation Guide
 
-### Solana Setup
+For comprehensive setup instructions, troubleshooting, and detailed explanations, please refer to **[HOW_TO_RUN.md](HOW_TO_RUN.md)**.
+
+### Optional: Solana Setup (for Phase 5)
 
 1. Install Solana CLI: https://docs.solana.com/cli/install-solana-cli-tools
 2. Install Anchor: https://www.anchor-lang.com/docs/installation
@@ -329,14 +578,14 @@ This generates diagrams in `visualizations/`:
 
 ## 👥 Author
 
-**Cryptography Course Assignment - AUEB MSc**  
+**Cryptography Course Assignment - University of Macedonia**  
 **Academic Year 2025-2026**
 
 ---
 
 ## 📝 License
 
-This project is created for educational purposes as part of the Cryptography course assignment at AUEB.
+This project is created for educational purposes as part of the Cryptography course assignment at University of Macedonia.
 
 ---
 
