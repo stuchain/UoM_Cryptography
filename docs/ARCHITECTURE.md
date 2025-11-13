@@ -135,7 +135,7 @@ secure_channel/
 
 ### 1. Phase Modules (phases/)
 
-Each phase is a **standalone Python module** that can be run independently or imported by the frontend.
+Each phase is a **standalone Python module** that can be run independently or imported by the backend.
 
 **Design Pattern:**
 - Each phase file contains:
