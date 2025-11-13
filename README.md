@@ -129,6 +129,7 @@ python scripts/demo_all_phases.py
 ## 📚 Documentation
 
 - **README.md** (this file) - Overview and quick start
+- **docs/EXECUTION_FLOW.md** - What happens when you run the app (run.bat → app.py → phases)
 - **docs/** - Additional detailed documentation
 
 ---

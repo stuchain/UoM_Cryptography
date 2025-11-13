@@ -70,18 +70,27 @@
    - Chart.js integration
    - Data flow
 
+### Execution and Runtime Documentation
+
+9. **[EXECUTION_FLOW.md](EXECUTION_FLOW.md)** ✅ **COMPLETE**
+   - Complete execution flow from run.bat to phase execution
+   - Startup sequence explained
+   - Runtime behavior
+   - File execution order
+   - Request-response flow
+
 ### Quick Reference
 
-9. **[HOW_TO_RUN.md](HOW_TO_RUN.md)** ✅ **EXISTS**
-   - Installation instructions
-   - Running guide
-   - Troubleshooting
+10. **[HOW_TO_RUN.md](HOW_TO_RUN.md)** ✅ **EXISTS**
+    - Installation instructions
+    - Running guide
+    - Troubleshooting
 
-10. **[DEMO_GUIDE.md](DEMO_GUIDE.md)** ✅ **EXISTS**
+11. **[DEMO_GUIDE.md](DEMO_GUIDE.md)** ✅ **EXISTS**
     - Step-by-step demo guide
     - Presentation tips
 
-11. **[TROUBLESHOOTING.txt](TROUBLESHOOTING.txt)** ✅ **EXISTS**
+12. **[TROUBLESHOOTING.txt](TROUBLESHOOTING.txt)** ✅ **EXISTS**
     - Common problems
     - Solutions
 
@@ -103,7 +112,8 @@
 ### For Quick Start
 
 1. **[HOW_TO_RUN.md](HOW_TO_RUN.md)** - Get it running
-2. **[DEMO_GUIDE.md](DEMO_GUIDE.md)** - Run demos
+2. **[EXECUTION_FLOW.md](EXECUTION_FLOW.md)** - Understand what happens when you run it
+3. **[DEMO_GUIDE.md](DEMO_GUIDE.md)** - Run demos
 
 ### For Troubleshooting
 
@@ -123,6 +133,7 @@
 | PHASE5_DETAILED.md | ✅ Complete | ~18 | 100% |
 | PHASE6_DETAILED.md | ✅ Complete | ~18 | 100% |
 | FRONTEND_DETAILED.md | ✅ Complete | ~15 | 100% |
+| EXECUTION_FLOW.md | ✅ Complete | ~12 | 100% |
 
 ---
 
@@ -183,6 +194,14 @@
 - UI component explanation
 - Chart.js integration
 - Real-time updates
+
+### EXECUTION_FLOW.md
+- Complete startup sequence (run.bat → app.py)
+- File execution order
+- Request-response flow
+- Phase execution flow
+- Runtime behavior
+- How everything works together
 
 ---
 
