@@ -533,7 +533,7 @@ def run_phase3():
             }
         })
         try:
-            bob_signing_pub.verify(alice_signature, alice_dh_pub_bytes)
+            alice_signing_pub.verify(alice_signature, alice_dh_pub_bytes)
             alice_signature_valid = True
             bob_key = derive_shared_key(bob_dh_priv, alice_dh_pub_bytes)
             steps.append({
@@ -591,7 +591,7 @@ def run_phase3():
             }
         })
         try:
-            alice_signing_pub.verify(bob_signature, bob_dh_pub_bytes)
+            bob_signing_pub.verify(bob_signature, bob_dh_pub_bytes)
             bob_signature_valid = True
             alice_key = derive_shared_key(alice_dh_priv, bob_dh_pub_bytes)
             steps.append({
