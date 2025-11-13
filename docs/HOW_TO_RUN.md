@@ -4,6 +4,41 @@ This guide provides step-by-step instructions to install and run the Secure Chan
 
 ---
 
+## ⚡ SUPER SIMPLE - Just Run This!
+
+**For Windows users - the easiest way:**
+
+1. **Double-click `run.bat`** (or right-click and select "Run")
+   - The script will automatically:
+     - Check if Python is installed
+     - Install dependencies if needed
+     - Start the server
+     - Open your browser
+
+2. **That's it!** The app will open at `http://localhost:5000`
+
+**Note:** If `run.bat` doesn't work, you can also use `RUN_ME.bat` which has the same functionality.
+
+**Alternative (PowerShell):**
+- Right-click `run.ps1` → "Run with PowerShell"
+- If you get an execution policy error, run this first in PowerShell:
+  ```powershell
+  Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+  ```
+
+**For macOS/Linux users:**
+1. Make the script executable:
+   ```bash
+   chmod +x run.sh
+   ```
+2. Run it:
+   ```bash
+   ./run.sh
+   ```
+- Or see the [Manual Installation](#-installation) section below
+
+---
+
 ## 📋 Table of Contents
 
 - [Prerequisites](#prerequisites)
@@ -117,7 +152,7 @@ You can run each cryptographic phase independently to understand the progression
 Demonstrates the fundamental key exchange protocol:
 
 ```bash
-python phase2_dh/dh_exchange.py
+python phases/phase1_dh/dh_exchange.py
 ```
 
 **What you'll see:**
@@ -131,7 +166,7 @@ python phase2_dh/dh_exchange.py
 Shows how an attacker can intercept and manipulate the key exchange:
 
 ```bash
-python phase3_mitm/mallory_attack.py
+python phases/phase2_mitm/mallory_attack.py
 ```
 
 **What you'll see:**
@@ -145,7 +180,7 @@ python phase3_mitm/mallory_attack.py
 Fixes the MITM vulnerability using digital signatures:
 
 ```bash
-python phase4_auth/authenticated_dh.py
+python phases/phase3_auth/authenticated_dh.py
 ```
 
 **What you'll see:**
@@ -158,7 +193,7 @@ python phase4_auth/authenticated_dh.py
 Complete secure channel with authenticated encryption:
 
 ```bash
-python phase5_aead/secure_channel.py
+python phases/phase4_aead/secure_channel.py
 ```
 
 **What you'll see:**
@@ -172,7 +207,7 @@ python phase5_aead/secure_channel.py
 Solana-based decentralized key registry:
 
 ```bash
-python phase6_solana/solana_registry_client.py
+python phases/phase5_solana/solana_registry_client.py
 ```
 
 **Note:** This requires Solana CLI and Anchor to be installed. See [Prerequisites](#prerequisites).

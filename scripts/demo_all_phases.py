@@ -144,7 +144,7 @@ Press Enter to start, or Ctrl+C to cancel...
     # Demonstrates the fundamental cryptographic primitive for key exchange
     # Shows that two parties can establish a shared secret without pre-shared keys
     run_phase(1, "Basic Diffie-Hellman Key Exchange", 
-              "phase2_dh/dh_exchange.py")
+              "phases/phase1_dh/dh_exchange.py")
     
     input("\nPress Enter to continue to Phase 2...")
     
@@ -154,7 +154,7 @@ Press Enter to start, or Ctrl+C to cancel...
     # Demonstrates the critical vulnerability: without authentication,
     # an attacker can intercept and replace public keys
     run_phase(2, "Man-in-the-Middle Attack", 
-              "phase3_mitm/mallory_attack.py")
+              "phases/phase2_mitm/mallory_attack.py")
     
     input("\nPress Enter to continue to Phase 3...")
     
@@ -164,7 +164,7 @@ Press Enter to start, or Ctrl+C to cancel...
     # Shows how to fix the MITM vulnerability by adding digital signatures
     # This is the critical fix that makes the protocol secure
     run_phase(3, "Authenticated Diffie-Hellman", 
-              "phase4_auth/authenticated_dh.py")
+              "phases/phase3_auth/authenticated_dh.py")
     
     input("\nPress Enter to continue to Phase 4...")
     
@@ -174,7 +174,7 @@ Press Enter to start, or Ctrl+C to cancel...
     # Complete secure channel implementation with authenticated encryption
     # This is what real-world secure protocols like TLS provide
     run_phase(4, "Secure Channel with AEAD Encryption", 
-              "phase5_aead/secure_channel.py")
+              "phases/phase4_aead/secure_channel.py")
     
     input("\nPress Enter to continue to Phase 5...")
     
@@ -184,7 +184,7 @@ Press Enter to start, or Ctrl+C to cancel...
     # Extends the secure channel with blockchain-based key registry
     # Demonstrates how blockchain can provide decentralized trust
     run_phase(5, "Blockchain Integration (Solana)", 
-              "phase6_solana/solana_registry_client.py")
+              "phases/phase5_solana/solana_registry_client.py")
     
     # ========================================================================
     # Summary and Key Takeaways

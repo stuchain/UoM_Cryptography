@@ -44,7 +44,7 @@ This will:
 
 ### Phase 1: Basic Diffie-Hellman Key Exchange
 
-**File**: `phase2_dh/dh_exchange.py`
+**File**: `phases/phase1_dh/dh_exchange.py`
 
 **What it demonstrates**:
 - Two parties (Alice and Bob) establish a shared secret
@@ -53,7 +53,7 @@ This will:
 
 **How to run**:
 ```bash
-cd phase2_dh
+cd phases/phase1_dh
 python dh_exchange.py
 ```
 
@@ -80,7 +80,7 @@ Bob   key: [64-char hex string]
 
 ### Phase 2: Man-in-the-Middle (MITM) Attack
 
-**File**: `phase3_mitm/mallory_attack.py`
+**File**: `phases/phase2_mitm/mallory_attack.py`
 
 **What it demonstrates**:
 - How an attacker (Mallory) intercepts key exchange
@@ -89,7 +89,7 @@ Bob   key: [64-char hex string]
 
 **How to run**:
 ```bash
-cd phase3_mitm
+cd phases/phase2_mitm
 python mallory_attack.py
 ```
 
@@ -129,7 +129,7 @@ Mallory's key with Bob   (hex): [...]
 
 ### Phase 3: Authenticated Diffie-Hellman
 
-**File**: `phase4_auth/authenticated_dh.py`
+**File**: `phases/phase3_auth/authenticated_dh.py`
 
 **What it demonstrates**:
 - How digital signatures (Ed25519) prevent MITM attacks
@@ -138,7 +138,7 @@ Mallory's key with Bob   (hex): [...]
 
 **How to run**:
 ```bash
-cd phase4_auth
+cd phases/phase3_auth
 python authenticated_dh.py
 ```
 
@@ -181,7 +181,7 @@ Bob receives Mallory's fake message and attempts verification
 
 ### Phase 4: Secure Channel with AEAD Encryption
 
-**File**: `phase5_aead/secure_channel.py`
+**File**: `phases/phase4_aead/secure_channel.py`
 
 **What it demonstrates**:
 - Complete secure channel with authenticated encryption
@@ -191,7 +191,7 @@ Bob receives Mallory's fake message and attempts verification
 
 **How to run**:
 ```bash
-cd phase5_aead
+cd phases/phase4_aead
 python secure_channel.py
 ```
 
@@ -232,7 +232,7 @@ Bob tries to decrypt tampered message...
 
 ### Phase 5: Blockchain Integration (Solana)
 
-**File**: `phase6_solana/solana_registry_client.py`
+**File**: `phases/phase5_solana/solana_registry_client.py`
 
 **What it demonstrates**:
 - Solana blockchain as decentralized key registry
@@ -241,7 +241,7 @@ Bob tries to decrypt tampered message...
 
 **How to run**:
 ```bash
-cd phase6_solana
+cd phases/phase5_solana
 python solana_registry_client.py
 ```
 
@@ -435,11 +435,11 @@ pip install -r requirements.txt
 python demo_all_phases.py
 
 # Run individual phases (from project root)
-python phase2_dh/dh_exchange.py
-python phase3_mitm/mallory_attack.py
-python phase4_auth/authenticated_dh.py
-python phase5_aead/secure_channel.py
-python phase6_solana/solana_registry_client.py
+python phases/phase1_dh/dh_exchange.py
+python phases/phase2_mitm/mallory_attack.py
+python phases/phase3_auth/authenticated_dh.py
+python phases/phase4_aead/secure_channel.py
+python phases/phase5_solana/solana_registry_client.py
 
 # Generate visualizations
 python visualizations/diagram_generator.py

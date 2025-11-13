@@ -24,7 +24,7 @@ CORS(app)  # Enable CORS for frontend-backend communication
 
 # Import phase modules
 try:
-    from phase2_dh.dh_exchange import generate_x25519_keypair, public_bytes, derive_shared_key
+    from phases.phase1_dh.dh_exchange import generate_x25519_keypair, public_bytes, derive_shared_key
     from cryptography.hazmat.primitives.asymmetric import ed25519
     from cryptography.hazmat.primitives.kdf.hkdf import HKDF
     from cryptography.hazmat.primitives import hashes, serialization
