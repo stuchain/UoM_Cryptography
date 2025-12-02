@@ -1,8 +1,4 @@
-"""
-Flask Backend for Secure Channel Demo Frontend
-
-This provides a REST API to run each phase and get results with visualization data.
-"""
+# Flask backend for secure channel demo
 
 from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
@@ -13,18 +9,14 @@ import io
 from contextlib import redirect_stdout
 import traceback
 
-# Add project root to path so we can import phase modules
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 
-# Flask app with paths pointing to frontend folder (one level up from backend)
 frontend_dir = os.path.join(project_root, 'frontend')
 app = Flask(__name__, 
             template_folder=os.path.join(frontend_dir, 'templates'),
             static_folder=os.path.join(frontend_dir, 'static'))
-CORS(app)  # Enable CORS for frontend-backend communication
-
-# Import phase modules
+CORS(app)
 try:
     from phases.phase1_dh.dh_exchange import generate_x25519_keypair, public_bytes, derive_shared_key
     from cryptography.hazmat.primitives.asymmetric import ed25519
@@ -41,18 +33,11 @@ except ImportError as e:
 
 @app.route('/')
 def index():
-    """Serve the main frontend page"""
     return render_template('index.html')
 
 
 @app.route('/api/phase1', methods=['POST'])
 def run_phase1():
-    """
-    Run Phase 1: Basic Diffie-Hellman Key Exchange
-    
-    Returns:
-        JSON with keys, visualization data, detailed steps, and status
-    """
     try:
         steps = []
         
@@ -212,12 +197,6 @@ def run_phase1():
 
 @app.route('/api/phase2', methods=['POST'])
 def run_phase2():
-    """
-    Run Phase 2: MITM Attack Demonstration
-    
-    Returns:
-        JSON with attack results, detailed steps, and visualization data
-    """
     try:
         steps = []
         
@@ -452,12 +431,6 @@ def run_phase2():
 
 @app.route('/api/phase3', methods=['POST'])
 def run_phase3():
-    """
-    Run Phase 3: Authenticated Diffie-Hellman
-    
-    Returns:
-        JSON with authentication results and detailed steps
-    """
     try:
         steps = []
         
@@ -715,12 +688,6 @@ def run_phase3():
 
 @app.route('/api/phase4', methods=['POST'])
 def run_phase4():
-    """
-    Run Phase 4: Secure Channel with AEAD
-    
-    Returns:
-        JSON with encryption results and detailed steps
-    """
     try:
         steps = []
         
@@ -949,12 +916,6 @@ def run_phase4():
 
 @app.route('/api/phase5', methods=['POST'])
 def run_phase5():
-    """
-    Run Phase 5: Blockchain Integration (Simulated)
-    
-    Returns:
-        JSON with blockchain simulation results
-    """
     try:
         # Generate keys
         alice_signing_priv = ed25519.Ed25519PrivateKey.generate()
@@ -1025,12 +986,6 @@ def run_phase5():
 
 @app.route('/api/phase6', methods=['POST'])
 def run_phase6():
-    """
-    Run Phase 6: Mallory's Attack on Blockchain-Integrated Secure Channel
-    
-    Returns:
-        JSON with attack demonstration results and detailed steps
-    """
     try:
         steps = []
         
@@ -1266,12 +1221,6 @@ def run_phase6():
 
 @app.route('/api/run-all', methods=['POST'])
 def run_all_phases():
-    """
-    Run all phases sequentially
-    
-    Returns:
-        JSON with results from all phases
-    """
     results = []
     
     for phase_num in range(1, 7):
