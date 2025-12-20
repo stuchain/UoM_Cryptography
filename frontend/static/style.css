@@ -13,7 +13,7 @@ body {
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1800px;
     margin: 0 auto;
 }
 
@@ -49,12 +49,15 @@ header p {
     margin-bottom: 20px;
     font-size: 1.2em;
     font-weight: 600;
+    text-align: center;
 }
 
 .buttons {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 12px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .btn {
@@ -93,21 +96,84 @@ header p {
 
 .phases {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-    gap: 20px;
+    grid-template-columns: 1fr;
+    gap: 40px;
 }
 
 .phase-card {
     background: #2a2a3a;
-    border: 1px solid #3a3a4a;
+    border: 2px solid #3a3a4a;
     border-radius: 8px;
     padding: 20px;
     word-break: break-word;
+    margin-bottom: 20px;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .phase-card.active {
     border-color: #6a8aff;
     background: #2a2a4a;
+    box-shadow: 0 0 15px rgba(106, 138, 255, 0.3);
+}
+
+/* Phase 1: Basic DH - Blue */
+.phase-card:nth-child(1) {
+    border-left: 4px solid #4a9eff;
+}
+
+.phase-card:nth-child(1):hover {
+    border-color: #4a9eff;
+    box-shadow: 0 0 10px rgba(74, 158, 255, 0.2);
+}
+
+/* Phase 2: MITM Attack - Red */
+.phase-card:nth-child(2) {
+    border-left: 4px solid #ff6b6b;
+}
+
+.phase-card:nth-child(2):hover {
+    border-color: #ff6b6b;
+    box-shadow: 0 0 10px rgba(255, 107, 107, 0.2);
+}
+
+/* Phase 3: Authenticated DH - Green */
+.phase-card:nth-child(3) {
+    border-left: 4px solid #51cf66;
+}
+
+.phase-card:nth-child(3):hover {
+    border-color: #51cf66;
+    box-shadow: 0 0 10px rgba(81, 207, 102, 0.2);
+}
+
+/* Phase 4: Secure Channel - Purple */
+.phase-card:nth-child(4) {
+    border-left: 4px solid #9775fa;
+}
+
+.phase-card:nth-child(4):hover {
+    border-color: #9775fa;
+    box-shadow: 0 0 10px rgba(151, 117, 250, 0.2);
+}
+
+/* Phase 5: Blockchain - Orange */
+.phase-card:nth-child(5) {
+    border-left: 4px solid #ffa94d;
+}
+
+.phase-card:nth-child(5):hover {
+    border-color: #ffa94d;
+    box-shadow: 0 0 10px rgba(255, 169, 77, 0.2);
+}
+
+/* Phase 6: Attack Prevention - Yellow */
+.phase-card:nth-child(6) {
+    border-left: 4px solid #ffd43b;
+}
+
+.phase-card:nth-child(6):hover {
+    border-color: #ffd43b;
+    box-shadow: 0 0 10px rgba(255, 212, 59, 0.2);
 }
 
 .phase-header {
@@ -132,6 +198,37 @@ header p {
     border-radius: 4px;
     font-size: 0.85em;
     font-weight: 600;
+}
+
+/* Color-coded phase number badges */
+.phase-card:nth-child(1) .phase-number {
+    background: #4a9eff;
+    color: #fff;
+}
+
+.phase-card:nth-child(2) .phase-number {
+    background: #ff6b6b;
+    color: #fff;
+}
+
+.phase-card:nth-child(3) .phase-number {
+    background: #51cf66;
+    color: #fff;
+}
+
+.phase-card:nth-child(4) .phase-number {
+    background: #9775fa;
+    color: #fff;
+}
+
+.phase-card:nth-child(5) .phase-number {
+    background: #ffa94d;
+    color: #fff;
+}
+
+.phase-card:nth-child(6) .phase-number {
+    background: #ffd43b;
+    color: #1e1e2e;
 }
 
 .status {
@@ -257,10 +354,16 @@ header p {
 
 .steps-container {
     margin-bottom: 20px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
 .step-item {
-    margin: 10px 0;
+    flex: 1 1 300px;
+    min-width: 250px;
+    margin: 0;
     padding: 12px;
     background: #1e1e2e;
     border-radius: 6px;
@@ -315,5 +418,10 @@ h3 {
     
     .comparison-grid {
         grid-template-columns: 1fr;
+    }
+    
+    .step-item {
+        flex: 1 1 100%;
+        min-width: 100%;
     }
 }
