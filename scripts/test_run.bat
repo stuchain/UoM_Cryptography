@@ -1,6 +1,5 @@
 @echo off
-REM Test script to diagnose issues with run.bat
-REM This will show you what's happening step by step
+REM Quick diagnostics for the demo launcher
 
 echo ============================================================
 echo DIAGNOSTIC TEST - Secure Channel Demo
@@ -10,12 +9,12 @@ echo This script will test if everything is set up correctly.
 echo.
 pause
 
-REM Change to script directory
+REM Go to repo root
 cd /d "%~dp0"
 echo Current directory: %CD%
 echo.
 
-REM Test Python
+REM Python
 echo Testing Python...
 python --version
 if errorlevel 1 (
@@ -28,7 +27,7 @@ if errorlevel 1 (
 )
 echo.
 
-REM Test requirements.txt
+REM Files
 echo Testing requirements.txt...
 if exist "requirements.txt" (
     echo [OK] requirements.txt found!
@@ -38,7 +37,7 @@ if exist "requirements.txt" (
 )
 echo.
 
-REM Test frontend directory
+REM Frontend files
 echo Testing frontend directory...
 if exist "frontend" (
     echo [OK] frontend directory found!
@@ -52,7 +51,7 @@ if exist "frontend" (
 )
 echo.
 
-REM Test Flask
+REM Flask
 echo Testing Flask installation...
 python -c "import flask; print('Flask version:', flask.__version__)"
 if errorlevel 1 (

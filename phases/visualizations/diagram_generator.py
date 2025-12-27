@@ -1,13 +1,4 @@
-"""
-Visualization Utilities for Secure Channel Project
-
-This module generates diagrams illustrating:
-1. Diffie-Hellman key exchange flow
-2. MITM attack scenario
-3. Authenticated protocol flow
-4. Secure channel with AEAD
-5. Blockchain-integrated verification
-"""
+# Generate the project diagrams (one image per phase).
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -16,7 +7,7 @@ import matplotlib.patheffects as path_effects
 
 
 def create_dh_exchange_diagram():
-    """Create a diagram showing basic DH key exchange between Alice and Bob"""
+    # Create a diagram showing basic DH key exchange between Alice and Bob
     fig, ax = plt.subplots(1, 1, figsize=(12, 8))
     ax.set_xlim(0, 10)
     ax.set_ylim(0, 6)
@@ -60,7 +51,7 @@ def create_dh_exchange_diagram():
 
 
 def create_mitm_attack_diagram():
-    """Create a diagram showing MITM attack"""
+    # Create a diagram showing MITM attack
     fig, ax = plt.subplots(1, 1, figsize=(14, 8))
     ax.set_xlim(0, 12)
     ax.set_ylim(0, 8)
@@ -126,7 +117,7 @@ def create_mitm_attack_diagram():
 
 
 def create_authenticated_flow_diagram():
-    """Create a diagram showing authenticated DH with signatures"""
+    # Create a diagram showing authenticated DH with signatures
     fig, ax = plt.subplots(1, 1, figsize=(14, 10))
     ax.set_xlim(0, 12)
     ax.set_ylim(0, 10)
@@ -192,7 +183,7 @@ def create_authenticated_flow_diagram():
 
 
 def create_secure_channel_diagram():
-    """Create a diagram showing complete secure channel with AEAD"""
+    # Create a diagram showing complete secure channel with AEAD
     fig, ax = plt.subplots(1, 1, figsize=(14, 10))
     ax.set_xlim(0, 12)
     ax.set_ylim(0, 10)
@@ -261,7 +252,7 @@ def create_secure_channel_diagram():
 
 
 def create_blockchain_diagram():
-    """Create a diagram showing blockchain-integrated key verification"""
+    # Create a diagram showing blockchain-integrated key verification
     fig, ax = plt.subplots(1, 1, figsize=(16, 10))
     ax.set_xlim(0, 14)
     ax.set_ylim(0, 10)
@@ -337,7 +328,7 @@ def create_blockchain_diagram():
 
 
 def generate_all_diagrams():
-    """Generate all visualization diagrams"""
+    # Generate all visualization diagrams
     import os
     os.makedirs('visualizations', exist_ok=True)
     

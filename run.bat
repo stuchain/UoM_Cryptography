@@ -1,4 +1,4 @@
 @echo off
-REM Simple launcher - calls the main script in scripts folder
+REM Run the demo (Windows)
 cd /d "%~dp0"
 call scripts\run.bat

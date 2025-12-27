@@ -116,7 +116,7 @@ header p {
     box-shadow: 0 0 15px rgba(106, 138, 255, 0.3);
 }
 
-/* Phase 1: Basic DH - Blue */
+/* Phase colors */
 .phase-card:nth-child(1) {
     border-left: 4px solid #4a9eff;
 }
@@ -126,7 +126,7 @@ header p {
     box-shadow: 0 0 10px rgba(74, 158, 255, 0.2);
 }
 
-/* Phase 2: MITM Attack - Red */
+/* Phase colors */
 .phase-card:nth-child(2) {
     border-left: 4px solid #ff6b6b;
 }
@@ -136,7 +136,7 @@ header p {
     box-shadow: 0 0 10px rgba(255, 107, 107, 0.2);
 }
 
-/* Phase 3: Authenticated DH - Green */
+/* Phase colors */
 .phase-card:nth-child(3) {
     border-left: 4px solid #51cf66;
 }
@@ -146,7 +146,7 @@ header p {
     box-shadow: 0 0 10px rgba(81, 207, 102, 0.2);
 }
 
-/* Phase 4: Secure Channel - Purple */
+/* Phase colors */
 .phase-card:nth-child(4) {
     border-left: 4px solid #9775fa;
 }
@@ -156,7 +156,7 @@ header p {
     box-shadow: 0 0 10px rgba(151, 117, 250, 0.2);
 }
 
-/* Phase 5: Blockchain - Orange */
+/* Phase colors */
 .phase-card:nth-child(5) {
     border-left: 4px solid #ffa94d;
 }
@@ -166,7 +166,7 @@ header p {
     box-shadow: 0 0 10px rgba(255, 169, 77, 0.2);
 }
 
-/* Phase 6: Attack Prevention - Yellow */
+/* Phase colors */
 .phase-card:nth-child(6) {
     border-left: 4px solid #ffd43b;
 }
@@ -200,7 +200,7 @@ header p {
     font-weight: 600;
 }
 
-/* Color-coded phase number badges */
+/* Phase number colors */
 .phase-card:nth-child(1) .phase-number {
     background: #4a9eff;
     color: #fff;

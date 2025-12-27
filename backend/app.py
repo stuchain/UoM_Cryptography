@@ -41,7 +41,7 @@ def run_phase1():
     try:
         steps = []
         
-        # Step 1: Alice generates keypair
+        # Alice: keypair
         steps.append({
             'step': 1,
             'title': 'Alice generates X25519 keypair',
@@ -66,7 +66,7 @@ def run_phase1():
             }
         })
         
-        # Step 2: Bob generates keypair
+        # Bob: keypair
         steps.append({
             'step': 3,
             'title': 'Bob generates X25519 keypair',
@@ -89,7 +89,7 @@ def run_phase1():
             }
         })
         
-        # Step 3: Key exchange (simulated)
+        # Public key exchange (simulated)
         steps.append({
             'step': 5,
             'title': 'Public key exchange',
@@ -101,7 +101,7 @@ def run_phase1():
             }
         })
         
-        # Step 4: Alice derives shared key
+        # Alice: derive shared key
         steps.append({
             'step': 6,
             'title': 'Alice derives shared secret',
@@ -125,7 +125,7 @@ def run_phase1():
             }
         })
         
-        # Step 5: Bob derives shared key
+        # Bob: derive shared key
         steps.append({
             'step': 8,
             'title': 'Bob derives shared secret',
@@ -148,7 +148,7 @@ def run_phase1():
             }
         })
         
-        # Step 6: Verification
+        # Verify both sides match
         keys_match = alice_key == bob_key
         steps.append({
             'step': 10,
@@ -200,7 +200,7 @@ def run_phase2():
     try:
         steps = []
         
-        # Step 1: Alice generates keypair
+        # Alice: keypair
         steps.append({
             'step': 1,
             'title': 'Alice generates keypair',
@@ -210,7 +210,7 @@ def run_phase2():
         alice_priv, alice_pub = generate_x25519_keypair()
         alice_pub_bytes = public_bytes(alice_pub)
         
-        # Step 2: Alice sends to Bob (intercepted)
+        # Alice -> Bob (intercepted)
         steps.append({
             'step': 2,
             'title': 'Alice sends public key to Bob',
@@ -222,7 +222,7 @@ def run_phase2():
             }
         })
         
-        # Step 3: Mallory intercepts Alice's key
+        # Mallory: intercept Alice
         steps.append({
             'step': 3,
             'title': '⚠️ MALLORY INTERCEPTS',
@@ -235,7 +235,7 @@ def run_phase2():
             }
         })
         
-        # Step 4: Mallory generates fake keypairs
+        # Mallory: fake keypairs
         steps.append({
             'step': 4,
             'title': 'Mallory generates fake keypairs',
@@ -251,7 +251,7 @@ def run_phase2():
         mallory_alice_pub_bytes = public_bytes(mallory_alice_pub)
         mallory_bob_pub_bytes = public_bytes(mallory_bob_pub)
         
-        # Step 5: Mallory derives key with Alice
+        # Mallory: key with Alice
         steps.append({
             'step': 5,
             'title': 'Mallory establishes key with Alice',
@@ -265,7 +265,7 @@ def run_phase2():
         alice_shared = derive_shared_key(alice_priv, mallory_bob_pub_bytes)
         mallory_key_with_alice = derive_shared_key(mallory_bob_priv, alice_pub_bytes)
         
-        # Step 6: Mallory sends fake Bob key to Alice
+        # Mallory -> Alice (fake Bob key)
         steps.append({
             'step': 6,
             'title': 'Mallory sends FAKE Bob key to Alice',
@@ -278,7 +278,7 @@ def run_phase2():
             }
         })
         
-        # Step 7: Bob generates keypair
+        # Bob: keypair
         steps.append({
             'step': 7,
             'title': 'Bob generates keypair',
@@ -288,7 +288,7 @@ def run_phase2():
         bob_priv, bob_pub = generate_x25519_keypair()
         bob_pub_bytes = public_bytes(bob_pub)
         
-        # Step 8: Bob sends to Alice (intercepted)
+        # Bob -> Alice (intercepted)
         steps.append({
             'step': 8,
             'title': 'Bob sends public key to Alice',
@@ -300,7 +300,7 @@ def run_phase2():
             }
         })
         
-        # Step 9: Mallory intercepts Bob's key
+        # Mallory: intercept Bob
         steps.append({
             'step': 9,
             'title': '⚠️ MALLORY INTERCEPTS AGAIN',
@@ -312,7 +312,7 @@ def run_phase2():
             }
         })
         
-        # Step 10: Mallory derives key with Bob
+        # Mallory: key with Bob
         steps.append({
             'step': 10,
             'title': 'Mallory establishes key with Bob',
@@ -326,7 +326,7 @@ def run_phase2():
         bob_shared = derive_shared_key(bob_priv, mallory_alice_pub_bytes)
         mallory_key_with_bob = derive_shared_key(mallory_alice_priv, bob_pub_bytes)
         
-        # Step 11: Mallory sends fake Alice key to Bob
+        # Mallory -> Bob (fake Alice key)
         steps.append({
             'step': 11,
             'title': 'Mallory sends FAKE Alice key to Bob',
@@ -339,7 +339,7 @@ def run_phase2():
             }
         })
         
-        # Step 12: Alice derives key (with fake Bob)
+        # Alice: derives (actually with Mallory)
         steps.append({
             'step': 12,
             'title': 'Alice derives shared key',
@@ -352,7 +352,7 @@ def run_phase2():
             }
         })
         
-        # Step 13: Bob derives key (with fake Alice)
+        # Bob: derives (actually with Mallory)
         steps.append({
             'step': 13,
             'title': 'Bob derives shared key',
@@ -365,7 +365,7 @@ def run_phase2():
             }
         })
         
-        # Step 14: Attack analysis
+        # Check if the MITM worked
         attack_success = (alice_shared == mallory_key_with_alice and 
                          bob_shared == mallory_key_with_bob and
                          alice_shared != bob_shared)
@@ -434,7 +434,7 @@ def run_phase3():
     try:
         steps = []
         
-        # Step 1: Alice generates keypairs
+        # Alice: DH + signing keys
         steps.append({
             'step': 1,
             'title': 'Alice generates TWO keypairs',
@@ -454,7 +454,7 @@ def run_phase3():
             format=serialization.PublicFormat.Raw
         )
         
-        # Step 2: Alice signs her DH public key
+        # Alice: sign DH public key
         steps.append({
             'step': 2,
             'title': 'Alice signs her DH public key',
@@ -477,7 +477,7 @@ def run_phase3():
             }
         })
         
-        # Step 3: Bob generates keypairs
+        # Bob: DH + signing keys
         steps.append({
             'step': 4,
             'title': 'Bob generates TWO keypairs',
@@ -496,7 +496,7 @@ def run_phase3():
             format=serialization.PublicFormat.Raw
         )
         
-        # Step 4: Bob verifies Alice's signature
+        # Bob: verify Alice signature
         steps.append({
             'step': 5,
             'title': 'Bob verifies Alice\'s signature',
@@ -535,7 +535,7 @@ def run_phase3():
                 }
             })
         
-        # Step 5: Bob signs his DH public key
+        # Bob: sign DH public key
         steps.append({
             'step': 7,
             'title': 'Bob signs his DH public key',
@@ -555,7 +555,7 @@ def run_phase3():
             }
         })
         
-        # Step 6: Alice verifies Bob's signature
+        # Alice: verify Bob signature
         steps.append({
             'step': 9,
             'title': 'Alice verifies Bob\'s signature',
@@ -595,7 +595,7 @@ def run_phase3():
         authenticated = alice_signature_valid and bob_signature_valid
         keys_match = authenticated and (alice_key == bob_key)
         
-        # Step 7: Test Mallory's attack
+        # Mallory test
         steps.append({
             'step': 11,
             'title': '🔒 Testing MITM Attack Prevention',
@@ -691,7 +691,7 @@ def run_phase4():
     try:
         steps = []
         
-        # Step 1: Key exchange (simplified - assume already done)
+        # Key exchange already done (for this demo)
         steps.append({
             'step': 1,
             'title': 'Prerequisites: Authenticated Key Exchange',
@@ -989,7 +989,7 @@ def run_phase6():
     try:
         steps = []
         
-        # Step 1: Initialize blockchain registry
+        # Registry setup (simulated)
         steps.append({
             'step': 1,
             'title': 'Initialize Blockchain Registry',
@@ -1031,7 +1031,7 @@ def run_phase6():
             format=serialization.PublicFormat.Raw
         )
         
-        # Step 2: Register legitimate keys
+        # Register Alice/Bob keys
         steps.append({
             'step': 2,
             'title': 'Alice and Bob register keys on blockchain',
@@ -1115,7 +1115,7 @@ def run_phase6():
         
         # Bob verifies: Is alice_signing_pub_bytes registered for alice_address?
         # Answer: Yes (it's registered)
-        # But Mallory is trying to use it with her own address, so Bob checks Mallory's address
+        # Bob checks the address being claimed
         # Bob finds: Mallory's address has Mallory's key, not Alice's key
         attack3_prevented = True  # Bob verifies and finds mismatch
         steps.append({

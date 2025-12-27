@@ -1,12 +1,11 @@
-# Simple PowerShell launcher script for Secure Channel Demo
-# This script checks dependencies and starts the frontend automatically
+# Run the demo (Windows / PowerShell)
 
 Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host "Secure Channel Demo - Simple Launcher" -ForegroundColor Cyan
 Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Check if Python is installed
+# Python check
 try {
     $pythonVersion = python --version 2>&1
     Write-Host "[OK] Python found: $pythonVersion" -ForegroundColor Green
@@ -20,7 +19,7 @@ try {
     exit 1
 }
 
-# Check if we're in the right directory
+# Run from repo root
 if (-not (Test-Path "requirements.txt")) {
     Write-Host "[ERROR] requirements.txt not found!" -ForegroundColor Red
     Write-Host "Please run this script from the project root directory." -ForegroundColor Yellow
@@ -29,7 +28,7 @@ if (-not (Test-Path "requirements.txt")) {
     exit 1
 }
 
-# Check if dependencies are installed
+# Dependencies
 Write-Host ""
 Write-Host "Checking dependencies..." -ForegroundColor Cyan
 try {
@@ -49,7 +48,7 @@ try {
     Write-Host "[OK] Dependencies installed successfully!" -ForegroundColor Green
 }
 
-# Navigate to frontend directory
+# Sanity checks
 if (-not (Test-Path "frontend")) {
     Write-Host "[ERROR] frontend directory not found!" -ForegroundColor Red
     Read-Host "Press Enter to exit"
@@ -76,11 +75,11 @@ Write-Host "Press Ctrl+C to stop the server" -ForegroundColor Yellow
 Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Wait a moment then open browser
+# Open the browser
 Start-Sleep -Seconds 3
 Start-Process "http://localhost:5000"
 
-# Start the Flask server
+# Start server
 Set-Location frontend
 python app.py
 

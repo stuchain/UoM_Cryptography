@@ -1,13 +1,12 @@
 #!/bin/bash
-# Simple launcher script for Secure Channel Demo (macOS/Linux)
-# This script checks dependencies and starts the frontend automatically
+# Run the demo (macOS/Linux)
 
 echo "============================================================"
 echo "Secure Channel Demo - Simple Launcher"
 echo "============================================================"
 echo ""
 
-# Check if Python is installed
+# Python check
 if ! command -v python3 &> /dev/null; then
     echo "[ERROR] Python 3 is not installed!"
     echo ""
@@ -19,7 +18,7 @@ fi
 echo "[OK] Python found"
 python3 --version
 
-# Check if we're in the right directory
+# Run from repo root
 if [ ! -f "requirements.txt" ]; then
     echo "[ERROR] requirements.txt not found!"
     echo "Please run this script from the project root directory."
@@ -27,7 +26,7 @@ if [ ! -f "requirements.txt" ]; then
     exit 1
 fi
 
-# Check if dependencies are installed
+# Dependencies
 echo ""
 echo "Checking dependencies..."
 if ! python3 -c "import flask" 2>/dev/null; then
@@ -45,7 +44,7 @@ else
     echo "[OK] Dependencies already installed"
 fi
 
-# Check backend and frontend
+# Sanity checks
 if [ ! -d "backend" ]; then
     echo "[ERROR] backend directory not found!"
     exit 1
@@ -80,17 +79,17 @@ echo "Press Ctrl+C to stop the server"
 echo "============================================================"
 echo ""
 
-# Wait a moment then open browser (macOS)
+# Open the browser
 if [[ "$OSTYPE" == "darwin"* ]]; then
     sleep 3
     open http://localhost:5000
-# Linux - try to open browser
+# Linux
 elif command -v xdg-open &> /dev/null; then
     sleep 3
     xdg-open http://localhost:5000 &
 fi
 
-# Start the Flask server
+# Start server
 cd backend
 python3 app.py
 

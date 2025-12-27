@@ -1,4 +1,4 @@
-// Solana program entrypoint
+// Program entrypoint (demo)
 use anchor_lang::prelude::*;
 
 declare_id!("KeyRegistry11111111111111111111111111111");

@@ -1,15 +1,7 @@
-"""
-Phase 5: Solana Blockchain Integration - Key Registry Client
-
-This module provides a Python client to interact with the Solana Key Registry
-smart contract. It allows users to:
-1. Register their Ed25519 public keys on-chain
-2. Verify public keys against the on-chain registry
-3. Update registered keys
-
-The registry acts as a decentralized PKI (Public Key Infrastructure),
-preventing MITM attacks by providing a trusted source of public keys.
-"""
+# Phase 5: Solana key registry client (demo).
+#
+# In the real world this would talk to a deployed program; here it's mostly stubbed
+# out for the project walkthrough.
 
 import base64
 import json
@@ -31,24 +23,14 @@ from secure_channel import SecureChannel
 
 
 class SolanaKeyRegistryClient:
-    """
-    Client for interacting with the Solana Key Registry smart contract
-    """
+    # Client wrapper for the (demo) Solana key registry program.
     
     def __init__(self, rpc_url: str = "https://api.devnet.solana.com", program_id: Optional[str] = None):
-        """
-        Initialize the registry client
-        
-        Args:
-            rpc_url: Solana RPC endpoint URL
-            program_id: Program ID of the deployed Key Registry (default: test ID)
-        """
+        # Create a client for a given RPC endpoint and program id.
         self.rpc_url = rpc_url
         self.connection = solana_api.Client(rpc_url)
         self.program_id = Pubkey.from_string(program_id or "KeyRegistry11111111111111111111111111111")
         
-        # Load IDL (Interface Definition Language) for the program
-        # In production, load from on-chain or file
         self.idl = self._load_idl()
         
         print(f"Solana Key Registry Client initialized")
@@ -56,9 +38,7 @@ class SolanaKeyRegistryClient:
         print(f"Program ID: {self.program_id}")
     
     def _load_idl(self) -> dict:
-        """Load the IDL for the Key Registry program"""
-        # Simplified IDL structure
-        # In production, load from on-chain or Anchor-generated IDL file
+        # Return a minimal IDL-like dict (demo only).
         return {
             "version": "0.1.0",
             "name": "key_registry",
@@ -105,27 +85,13 @@ class SolanaKeyRegistryClient:
         }
     
     def _derive_key_record_pda(self, owner_pubkey: Pubkey) -> Tuple[Pubkey, int]:
-        """
-        Derive the PDA (Program Derived Address) for a key record
-        
-        Returns:
-            (pda_pubkey, bump_seed)
-        """
+        # Derive the PDA for a user's key record.
         seeds = [b"key_record", bytes(owner_pubkey)]
         pda, bump = Pubkey.find_program_address(seeds, self.program_id)
         return pda, bump
     
     def register_key(self, wallet_keypair: Keypair, ed25519_public_key: bytes) -> str:
-        """
-        Register an Ed25519 public key on-chain for the wallet owner
-        
-        Args:
-            wallet_keypair: Solana wallet keypair (signer)
-            ed25519_public_key: 32-byte Ed25519 public key to register
-        
-        Returns:
-            Transaction signature
-        """
+        # Register an Ed25519 public key (stubbed).
         if len(ed25519_public_key) != 32:
             raise ValueError("Ed25519 public key must be 32 bytes")
         
@@ -136,54 +102,29 @@ class SolanaKeyRegistryClient:
         print(f"Key Record PDA: {key_record_pda}")
         print(f"Public key (hex): {ed25519_public_key.hex()}")
         
-        # In a real implementation, you would:
-        # 1. Build the instruction using Anchor
-        # 2. Create a transaction
-        # 3. Sign and send it
-        
-        # For demonstration, we'll simulate the transaction
         print("✅ Registration instruction prepared")
         print("   (In production, this would be sent as a Solana transaction)")
         
-        # Return a mock transaction signature for demo
         return "mock_tx_signature_for_demo"
     
     def verify_key(self, owner_pubkey_str: str, ed25519_public_key: bytes) -> bool:
-        """
-        Verify if a public key matches what's registered on-chain
-        
-        Args:
-            owner_pubkey_str: Solana wallet address of the key owner
-            ed25519_public_key: Public key to verify (32 bytes)
-        
-        Returns:
-            True if the key matches, False otherwise
-        """
+        # Check whether a key record exists (demo).
         owner_pubkey = Pubkey.from_string(owner_pubkey_str)
         key_record_pda, _ = self._derive_key_record_pda(owner_pubkey)
         
         print(f"Verifying public key for owner: {owner_pubkey}")
         print(f"Checking Key Record PDA: {key_record_pda}")
         
-        # In a real implementation:
-        # 1. Fetch the KeyRecord account from the blockchain
-        # 2. Compare the stored public_key with ed25519_public_key
-        
-        # For demonstration, simulate verification
         try:
-            # Mock: In production, fetch account data here
             account_info = self.connection.get_account_info(key_record_pda)
             
             if account_info.value is None:
                 print("❌ Key record not found on-chain")
                 return False
             
-            # Decode account data and verify
-            # (In production, deserialize according to KeyRecord structure)
             print("✅ Key record found on-chain")
             print("   (In production, would deserialize and compare keys)")
             
-            # For demo, return True if account exists
             return True
             
         except Exception as e:
@@ -192,33 +133,16 @@ class SolanaKeyRegistryClient:
 
 
 class SecureChannelWithBlockchain(SecureChannel):
-    """
-    Extended secure channel that uses Solana blockchain for key verification
-    """
+    # Secure channel with an extra on-chain key check.
     
     def __init__(self, name: str, solana_address: str, registry_client: SolanaKeyRegistryClient):
-        """
-        Initialize secure channel with blockchain integration
-        
-        Args:
-            name: Participant name
-            solana_address: Solana wallet address for blockchain identity
-            registry_client: Solana registry client instance
-        """
+        # Wrap SecureChannel and add a Solana address + registry client.
         super().__init__(name)
         self.solana_address = solana_address
         self.registry_client = registry_client
     
     def verify_peer_via_blockchain(self, peer_solana_address: str, peer_signing_pub_bytes: bytes) -> bool:
-        """
-        Verify peer's signing public key against Solana blockchain registry
-        
-        This adds a layer of trust: before accepting a peer's public key,
-        we verify it matches what's registered on-chain for their Solana address.
-        
-        Returns:
-            True if key is verified on-chain, False otherwise
-        """
+        # Verify a peer signing key against the registry.
         print(f"\n{self.name}: Verifying peer's key via Solana blockchain...")
         print(f"  Peer Solana address: {peer_solana_address}")
         print(f"  Peer signing key (hex): {peer_signing_pub_bytes.hex()}")
@@ -236,12 +160,7 @@ class SecureChannelWithBlockchain(SecureChannel):
         return is_valid
     
     def register_key_on_blockchain(self, wallet_keypair):
-        """
-        Register this participant's signing public key on Solana blockchain
-        
-        Args:
-            wallet_keypair: Solana wallet keypair to sign the transaction
-        """
+        # Register our signing key (demo).
         print(f"\n{self.name}: Registering signing key on Solana blockchain...")
         signing_pub_bytes = self.participant.signing_public_bytes
         
@@ -254,9 +173,7 @@ class SecureChannelWithBlockchain(SecureChannel):
 
 
 def demonstrate_blockchain_integration():
-    """
-    Demonstrate secure channel with Solana blockchain key verification
-    """
+    # Run the Phase 5 demo.
     print("=" * 70)
     print("PHASE 5: Secure Channel with Solana Blockchain Integration")
     print("=" * 70)

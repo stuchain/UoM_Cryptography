@@ -1,11 +1,11 @@
 @echo off
-REM Enhanced launcher - keeps window open and shows all output
+REM Demo launcher (Windows)
 title Secure Channel Demo Launcher
 
-REM Make sure we're in the right directory
+REM Run from repo root
 cd /d "%~dp0"
 
-REM Clear screen and show header
+REM Header
 cls
 echo.
 echo ============================================================
@@ -17,7 +17,7 @@ echo.
 echo Current folder: %CD%
 echo.
 
-REM Test Python first
+REM Python
 echo [1/5] Checking Python installation...
 python --version 2>nul
 if errorlevel 1 (
@@ -43,7 +43,7 @@ python --version
 echo [OK] Python found!
 echo.
 
-REM Check requirements.txt
+REM Files
 echo [2/5] Checking project files...
 if not exist "requirements.txt" (
     cls
@@ -64,7 +64,7 @@ if not exist "requirements.txt" (
 echo [OK] Project files found!
 echo.
 
-REM Check dependencies
+REM Dependencies
 echo [3/5] Checking dependencies...
 python -c "import flask" 2>nul
 if errorlevel 1 (
@@ -93,7 +93,7 @@ if errorlevel 1 (
 )
 echo.
 
-REM Check backend and frontend
+REM Backend/frontend
 echo [4/5] Checking backend and frontend...
 if not exist "backend\app.py" (
     cls
@@ -140,15 +140,15 @@ echo.
 echo ============================================================
 echo.
 
-REM Wait and open browser
+REM Open browser
 timeout /t 2 /nobreak >nul
 start http://localhost:5000
 
-REM Start Flask
+REM Run Flask
 cd backend
 python app.py
 
-REM If server stops
+REM When server stops
 echo.
 echo.
 echo ============================================================

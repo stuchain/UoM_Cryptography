@@ -1,28 +1,6 @@
-"""
-Phase 6: Mallory's Attack on Blockchain-Integrated Secure Channel
-
-This script demonstrates how Mallory attempts to attack the blockchain-integrated
-secure channel and how the blockchain prevents these attacks.
-
-Attack Scenarios:
-1. Mallory tries to register Alice's key using Alice's Solana address
-   → FAILS: Mallory doesn't own Alice's wallet, can't sign transaction
-   
-2. Mallory tries to register her own key using Alice's address
-   → FAILS: Transaction requires signature from Alice's wallet
-   
-3. Mallory intercepts Alice's key and tries to use it with her own address
-   → FAILS: Bob verifies key on-chain, finds mismatch with Alice's registered key
-   
-4. Mallory registers her own key for her own address
-   → SUCCEEDS (but useless): Bob verifies against Alice's address, not Mallory's
-
-This demonstrates that blockchain provides an additional security layer by:
-- Binding identities to wallet addresses
-- Requiring wallet ownership to register keys
-- Providing immutable, verifiable key registry
-- Preventing impersonation attacks
-"""
+# Phase 6: blockchain-based MITM prevention demo.
+#
+# Mallory tries a few key-swapping tricks; the registry checks stop them.
 
 from cryptography.hazmat.primitives.asymmetric import x25519, ed25519
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
@@ -33,51 +11,23 @@ import binascii
 import sys
 import os
 
-# Import Phase 3 components for authenticated key exchange
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'phase3_auth'))
 from authenticated_dh import AuthenticatedParticipant
 
-# Import Phase 5 components for blockchain integration
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'phase5_solana'))
 from solana_registry_client import SolanaKeyRegistryClient
 
 
 class BlockchainRegistry:
-    """
-    Simulated blockchain registry for key storage and verification.
-    
-    In a real implementation, this would interact with Solana blockchain.
-    For demonstration, we simulate the blockchain behavior.
-    """
+    # Tiny in-memory stand-in for an on-chain key registry.
     
     def __init__(self):
-        """
-        Initialize the blockchain registry.
-        
-        The registry maps Solana wallet addresses to Ed25519 public keys.
-        Only the wallet owner can register/update their key.
-        """
-        # Dictionary: {wallet_address: registered_ed25519_public_key_bytes}
+        # Map wallet address -> Ed25519 public key bytes.
         self.registry = {}
         print("Blockchain Registry initialized (simulated)")
     
     def register_key(self, wallet_address: str, wallet_keypair, ed25519_public_key: bytes) -> bool:
-        """
-        Register an Ed25519 public key for a Solana wallet address.
-        
-        Args:
-            wallet_address: Solana wallet address (must match wallet_keypair)
-            wallet_keypair: Solana wallet keypair (proves ownership)
-            ed25519_public_key: 32-byte Ed25519 public key to register
-        
-        Returns:
-            True if registration succeeds, False otherwise
-        
-        Security: Only the wallet owner can register a key for their address.
-        This is enforced by requiring the wallet_keypair to sign the transaction.
-        """
-        # Verify that wallet_keypair matches wallet_address
-        # In real Solana, this is done by verifying the transaction signature
+        # Register a key if the keypair matches the address (simulated ownership check).
         wallet_pubkey = str(wallet_keypair.pubkey())
         
         if wallet_pubkey != wallet_address:
@@ -86,8 +36,6 @@ class BlockchainRegistry:
             print(f"   Keypair address: {wallet_pubkey}")
             return False
         
-        # In real Solana, the transaction would be signed by wallet_keypair
-        # Here we simulate: if addresses match, registration succeeds
         self.registry[wallet_address] = ed25519_public_key
         print(f"[BLOCKCHAIN] Key registered successfully")
         print(f"   Wallet address: {wallet_address}")
@@ -95,19 +43,7 @@ class BlockchainRegistry:
         return True
     
     def verify_key(self, wallet_address: str, ed25519_public_key: bytes) -> bool:
-        """
-        Verify if an Ed25519 public key matches what's registered for a wallet address.
-        
-        Args:
-            wallet_address: Solana wallet address to check
-            ed25519_public_key: Ed25519 public key to verify (32 bytes)
-        
-        Returns:
-            True if key matches registry, False otherwise
-        
-        This is the critical security check: before accepting a peer's key,
-        we verify it matches what's registered on-chain for their address.
-        """
+        # Check whether a key matches the registry entry for an address.
         if wallet_address not in self.registry:
             print(f"[BLOCKCHAIN] Verification FAILED: No key registered for address")
             print(f"   Address: {wallet_address}")
@@ -130,24 +66,12 @@ class BlockchainRegistry:
 
 
 class BlockchainMallory:
-    """
-    Mallory attempting to attack the blockchain-integrated secure channel.
-    
-    Mallory will try multiple attack strategies, all of which should fail
-    due to blockchain security properties.
-    """
+    # Mallory tries to mess with registration/verification.
     
     def __init__(self, registry: BlockchainRegistry):
-        """
-        Initialize Mallory with access to the blockchain registry.
-        
-        Args:
-            registry: Blockchain registry instance
-        """
         self.name = "Mallory"
         self.registry = registry
         
-        # Mallory generates her own keypairs
         self.dh_priv, self.dh_pub = x25519.X25519PrivateKey.generate(), None
         self.dh_pub = self.dh_priv.public_key()
         self.signing_priv = ed25519.Ed25519PrivateKey.generate()
@@ -157,8 +81,7 @@ class BlockchainMallory:
             format=serialization.PublicFormat.Raw
         )
         
-        # Mallory's Solana wallet (different from Alice's and Bob's)
-        # In real Solana, this would be a Keypair
+        # Mallory's "wallet" (mock)
         self.mallory_wallet_address = "Mallory1111111111111111111111111111111111"
         self.mallory_wallet_keypair = type('MockKeypair', (), {
             'pubkey': lambda: type('MockPubkey', (), {'__str__': lambda: self.mallory_wallet_address})()
@@ -168,23 +91,13 @@ class BlockchainMallory:
         print(f"{self.name}: Wallet address: {self.mallory_wallet_address}")
     
     def attack_1_register_alice_key_with_alice_address(self, alice_address: str, alice_signing_pub_bytes: bytes):
-        """
-        Attack 1: Mallory tries to register Alice's key using Alice's address.
-        
-        Strategy: Mallory intercepts Alice's public key and tries to register it
-        for Alice's address, hoping to later replace it with her own.
-        
-        Expected Result: FAILS - Mallory doesn't own Alice's wallet, can't sign transaction.
-        """
+        # Attack 1: try to register Alice's key under Alice's address (should fail).
         print("\n" + "=" * 70)
         print("ATTACK 1: Mallory tries to register Alice's key with Alice's address")
         print("=" * 70)
         print(f"{self.name}: Intercepted Alice's signing public key")
         print(f"{self.name}: Attempting to register it for Alice's address...")
         
-        # Mallory tries to register Alice's key for Alice's address
-        # But she needs Alice's wallet keypair to sign the transaction
-        # Since Mallory doesn't have it, the transaction fails
         success = self.registry.register_key(
             alice_address,
             self.mallory_wallet_keypair,  # Mallory's wallet (WRONG!)
@@ -201,14 +114,7 @@ class BlockchainMallory:
         return not success  # Attack prevented = True
     
     def attack_2_register_own_key_with_alice_address(self, alice_address: str):
-        """
-        Attack 2: Mallory tries to register her own key using Alice's address.
-        
-        Strategy: Mallory tries to register her own Ed25519 key for Alice's address,
-        hoping Bob will accept it as Alice's key.
-        
-        Expected Result: FAILS - Transaction requires signature from Alice's wallet.
-        """
+        # Attack 2: try to register Mallory's key under Alice's address (should fail).
         print("\n" + "=" * 70)
         print("ATTACK 2: Mallory tries to register her own key with Alice's address")
         print("=" * 70)
@@ -232,21 +138,13 @@ class BlockchainMallory:
         return not success  # Attack prevented = True
     
     def attack_3_use_alice_key_with_own_address(self, alice_address: str, alice_signing_pub_bytes: bytes):
-        """
-        Attack 3: Mallory intercepts Alice's key and tries to use it with her own address.
-        
-        Strategy: Mallory intercepts Alice's public key during key exchange.
-        She then tries to use it, claiming it's registered for her own address.
-        
-        Expected Result: FAILS - Bob verifies key on-chain for Alice's address, finds mismatch.
-        """
+        # Attack 3: replay Alice's key while claiming a different address (should fail).
         print("\n" + "=" * 70)
         print("ATTACK 3: Mallory intercepts Alice's key and uses it with own address")
         print("=" * 70)
         print(f"{self.name}: Intercepted Alice's signing public key during key exchange")
         print(f"{self.name}: Attempting to use it, claiming it's registered for my address...")
         
-        # First, Mallory registers her own key for her own address (this works)
         print(f"{self.name}: Registering my own key for my own address (this should work)...")
         self.registry.register_key(
             self.mallory_wallet_address,
@@ -254,8 +152,6 @@ class BlockchainMallory:
             self.signing_pub_bytes
         )
         
-        # Now Mallory tries to trick Bob by sending Alice's key but claiming it's hers
-        # Bob will verify: is alice_signing_pub_bytes registered for alice_address?
         print(f"\n{self.name}: Sending intercepted Alice's key to Bob...")
         print(f"{self.name}: Bob will verify: Is this key registered for Alice's address?")
         
@@ -274,21 +170,13 @@ class BlockchainMallory:
         return not verification_result  # Attack prevented = True
     
     def attack_4_register_fake_key_for_own_address(self):
-        """
-        Attack 4: Mallory registers a fake key for her own address.
-        
-        Strategy: Mallory registers her own key for her own address, then tries
-        to use it when impersonating Alice.
-        
-        Expected Result: SUCCEEDS for registration, but USELESS - Bob verifies against Alice's address.
-        """
+        # Attack 4: register Mallory's key under Mallory's address (works, but doesn't help).
         print("\n" + "=" * 70)
         print("ATTACK 4: Mallory registers fake key for her own address")
         print("=" * 70)
         print(f"{self.name}: Registering my own key for my own address...")
         print(f"{self.name}: This should work (I own my wallet)...")
         
-        # This registration succeeds (Mallory owns her wallet)
         success = self.registry.register_key(
             self.mallory_wallet_address,
             self.mallory_wallet_keypair,
@@ -302,7 +190,6 @@ class BlockchainMallory:
             print(f"   Bob will verify: Is Mallory's key registered for Alice's address?")
             print(f"   Answer: NO - Attack fails!")
             
-            # Demonstrate: Bob verifies against Alice's address
             print(f"\n   Simulating Bob's verification...")
             bob_verification = self.registry.verify_key(
                 "Alice1111111111111111111111111111111111",  # Alice's address
@@ -320,14 +207,14 @@ class BlockchainMallory:
 
 
 def demonstrate_blockchain_mitm_attack():
-    """
-    Demonstrate Mallory's attacks on blockchain-integrated secure channel.
-    
-    This shows how blockchain prevents various MITM attack strategies by:
-    1. Requiring wallet ownership to register keys
-    2. Binding identities to wallet addresses
-    3. Providing verifiable, immutable key registry
-    """
+    #
+    # Demonstrate Mallory's attacks on blockchain-integrated secure channel.
+    #
+    # This shows how blockchain prevents various MITM attack strategies by:
+    # 1. Requiring wallet ownership to register keys
+    # 2. Binding identities to wallet addresses
+    # 3. Providing verifiable, immutable key registry
+    #
     print("=" * 70)
     print("PHASE 6: Mallory's Attack on Blockchain-Integrated Secure Channel")
     print("=" * 70)
