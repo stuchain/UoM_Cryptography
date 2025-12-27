@@ -1258,9 +1258,11 @@ if __name__ == '__main__':
     print("Secure Channel Demo - Backend Server")
     print("=" * 60)
     print("\nStarting Flask server...")
-    print("Open your browser to: http://localhost:5000")
+    port = int(os.environ.get("PORT", "5000"))
+    host = os.environ.get("HOST", "0.0.0.0")
+    print(f"Open your browser to: http://localhost:{port}")
     print("\nPress Ctrl+C to stop the server")
     print("=" * 60)
     
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host=host, port=port)
 

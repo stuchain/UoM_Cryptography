@@ -1,109 +1,56 @@
-# 🔐 Secure Channel Demo
+# Secure Channel Demo
 
-**Cryptography Course Assignment - University of Macedonia**
+Cryptography course assignment (University of Macedonia).
 
-A comprehensive demonstration of building a secure communication channel, from basic key exchange to blockchain-integrated authentication.
+The goal of this assignment is to show—step by step—how you go from “two people exchanging keys” to something that looks like a real secure channel:
+- what Diffie-Hellman gives you (and what it *doesn’t*)
+- how a man-in-the-middle breaks unauthenticated key exchange
+- how signatures bind a key to an identity
+- how AEAD gives you encrypted messages that also detect tampering
 
----
+I built it as a small interactive demo (web UI + Python scripts). You can run each phase on its own, see the keys/messages change, and see exactly where Mallory succeeds/fails.
 
-## ⚡ Quick Start
+This repo is a small “build-up” demo of a secure channel:
+- start with plain Diffie-Hellman
+- break it with a MITM
+- fix it with signatures
+- add AEAD for encrypted messages
+- add a Solana-style key registry + show why it helps
 
-### Windows
-**Just double-click `run.bat`** - that's it!
+### Quick start (recommended)
 
-### macOS / Linux
-**Just run `./run.sh`** - that's it!
+- **macOS / Linux**:
 
-Or if you prefer:
 ```bash
 bash run.sh
 ```
 
-The app will open automatically at `http://localhost:5000`
+- **Windows**:
+  - Double-click `run.bat`
+  - or run `scripts\run.bat`
+  - or run `scripts\run.ps1`
 
----
+The launcher will:
+- create a local virtual environment at `.venv/`
+- install dependencies into it (first run only)
+- start the Flask backend + open the UI in your browser
+- choose a free port automatically (5000, 5001, 5002, …)
 
-## 📁 Project Structure
+### What you’ll see (phases)
 
-```
-secure_channel/
-├── run.bat                 # Quick launcher (Windows)
-├── run.sh                  # Quick launcher (macOS/Linux)
-├── requirements.txt        # Python dependencies
-├── README.md              # This file
-│
-├── phases/                # All implementation phases
-│   ├── phase1_dh/         # Basic Diffie-Hellman
-│   ├── phase2_mitm/        # MITM attack demo
-│   ├── phase3_auth/        # Authenticated DH
-│   ├── phase4_aead/        # Secure channel with AEAD
-│   ├── phase5_solana/      # Blockchain integration
-│   ├── phase6_blockchain_attack/  # Blockchain attack prevention
-│   └── visualizations/     # Diagram generators
-│
-├── backend/               # Backend server
-│   └── app.py            # Flask API server
-│
-├── frontend/              # Frontend files
-│   ├── templates/         # HTML templates
-│   └── static/            # CSS & JavaScript
-│
-├── scripts/                # Utility scripts
-│   ├── run.bat            # Windows launcher
-│   ├── run.ps1             # PowerShell version
-│   ├── run.sh              # macOS/Linux launcher
-│   ├── demo_all_phases.py  # Run all phases
-│   └── test_env.py         # Environment checker
-│
-└── docs/                   # Additional documentation
-```
+- **Phase 1 (X25519 DH)**: Alice/Bob derive the same symmetric key
+- **Phase 2 (MITM)**: Mallory swaps keys; Alice and Bob do *not* share a key with each other
+- **Phase 3 (Authenticated DH)**: Ed25519 signatures stop the MITM
+- **Phase 4 (Secure channel)**: ChaCha20-Poly1305 encrypts messages + detects tampering
+- **Phase 5 (Blockchain registry demo)**: a “key registry” idea using Solana-style identities
+- **Phase 6 (Blockchain attack attempts)**: Mallory tries a few tricks; registry checks catch them
 
----
+### Running without the UI (CLI)
 
-## 🎯 What This Demonstrates
+Once your `.venv` exists:
 
-1. **Phase 1: Basic Diffie-Hellman** - X25519 key exchange
-2. **Phase 2: MITM Attack** - Vulnerability demonstration
-3. **Phase 3: Authenticated DH** - Ed25519 signatures prevent attacks
-4. **Phase 4: Secure Channel** - ChaCha20-Poly1305 AEAD encryption
-5. **Phase 5: Blockchain** - Solana-based key registry
-6. **Phase 6: Blockchain Attack Prevention** - Mallory's attacks on blockchain, all prevented
-
----
-
-## 📦 Installation
-
-### Prerequisites
-- Python 3.10 or higher
-- Internet connection (for first-time setup)
-
-### Automatic Setup
-The launcher script (`run.bat` or `scripts/run.sh`) will automatically:
-- ✅ Check Python installation
-- ✅ Install all dependencies
-- ✅ Start the server
-- ✅ Open your browser
-
-### Manual Setup
 ```bash
-pip install -r requirements.txt
-cd backend
-python app.py
-```
-
----
-
-## 🚀 Usage
-
-### Interactive Web Interface (Recommended)
-1. Run `run.bat` (or `scripts/run.sh`)
-2. Browser opens automatically
-3. Click phase buttons to test each cryptographic protocol
-4. View step-by-step details, visualizations, and results
-
-### Command Line
-Run individual phases:
-```bash
+. .venv/bin/activate
 python phases/phase1_dh/dh_exchange.py
 python phases/phase2_mitm/mallory_attack.py
 python phases/phase3_auth/authenticated_dh.py
@@ -112,65 +59,27 @@ python phases/phase5_solana/solana_registry_client.py
 python phases/phase6_blockchain_attack/blockchain_mitm_attack.py
 ```
 
-Run all phases:
+Run the full walkthrough:
+
 ```bash
+. .venv/bin/activate
 python scripts/demo_all_phases.py
 ```
 
----
+### Project layout
 
-## 🔧 Technology Stack
+- **`backend/`**: Flask server (`backend/app.py`)
+- **`frontend/`**: HTML/CSS/JS UI
+- **`phases/`**: the phase scripts (1–6)
+- **`scripts/`**: launchers + helpers
 
-- **Cryptography**: `cryptography` library (X25519, Ed25519, ChaCha20-Poly1305)
-- **Web Framework**: Flask
-- **Frontend**: HTML, CSS, JavaScript, Chart.js
-- **Blockchain**: Solana (optional, Phase 5)
+### Troubleshooting
 
----
+- **Port in use**: the launcher will auto-pick a free port. If you want a specific one:
 
-## 📚 Documentation
+```bash
+PORT=5050 bash run.sh
+```
 
-- **README.md** (this file) - Overview and quick start
-- **docs/EXECUTION_FLOW.md** - What happens when you run the app (run.bat → app.py → phases)
-- **docs/** - Additional detailed documentation
+- **Dependencies**: delete `.venv/` and re-run the launcher to rebuild it.
 
----
-
-## 🎓 Learning Objectives
-
-By exploring this project, you will understand:
-- How secure channels are constructed from cryptographic primitives
-- The critical importance of authentication in key exchange
-- How AEAD schemes provide confidentiality and integrity
-- Blockchain as a decentralized trust layer for PKI
-- Real-world attacks (MITM) and their mitigations
-- How blockchain prevents impersonation attacks through wallet ownership
-
----
-
-## ⚠️ Troubleshooting
-
-**Python not found:**
-- Install Python 3.10+ from python.org
-- Check "Add Python to PATH" during installation
-- Restart your computer after installation
-
-**Port 5000 in use:**
-- Close other applications using port 5000
-- Or edit `backend/app.py` and change the port number
-
-**Dependencies not installing:**
-- Check internet connection
-- Try: `pip install -r requirements.txt` manually
-
-For more help, see `docs/TROUBLESHOOTING.txt`
-
----
-
-## 📝 License
-
-Educational project for Cryptography course at University of Macedonia.
-
----
-
-**Last Updated:** December 2024

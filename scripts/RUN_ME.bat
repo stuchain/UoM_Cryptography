@@ -2,8 +2,18 @@
 REM Demo launcher (Windows)
 title Secure Channel Demo Launcher
 
-REM Run from repo root
-cd /d "%~dp0"
+REM Go to repo root
+cd /d "%~dp0\.."
+
+REM Pick a free port (5000, 5001, ...)
+if "%PORT%"=="" set PORT=5000
+:findport
+set INUSE=
+for /f "tokens=1,2,3,4,5" %%a in ('netstat -ano ^| findstr /r /c:":%PORT% .*LISTENING"') do set INUSE=1
+if defined INUSE (
+    set /a PORT+=1
+    goto findport
+)
 
 REM Header
 cls
@@ -66,13 +76,33 @@ echo.
 
 REM Dependencies
 echo [3/5] Checking dependencies...
-python -c "import flask" 2>nul
+REM Use a local venv to avoid system Python permission issues
+if not exist ".venv\Scripts\python.exe" (
+    echo [INFO] Creating virtual environment (.venv)...
+    python -m venv .venv
+    if errorlevel 1 (
+        cls
+        echo.
+        echo ============================================================
+        echo ERROR: Failed to create virtual environment
+        echo ============================================================
+        echo.
+        echo Try installing Python 3.10+ and make sure it's on PATH.
+        echo.
+        echo Press any key to exit...
+        pause >nul
+        exit /b 1
+    )
+)
+set "PYTHON=%CD%\.venv\Scripts\python.exe"
+
+%PYTHON% -c "import flask" 2>nul
 if errorlevel 1 (
     echo [INFO] Dependencies not installed. Installing now...
     echo This may take a few minutes. Please wait...
     echo.
-    python -m pip install --upgrade pip --quiet
-    python -m pip install -r requirements.txt
+    %PYTHON% -m pip install --upgrade pip setuptools wheel --quiet
+    %PYTHON% -m pip install -r requirements.txt
     if errorlevel 1 (
         cls
         echo.
@@ -132,7 +162,7 @@ echo    SERVER STARTING
 echo ============================================================
 echo.
 echo The web interface will open in your browser at:
-echo    http://localhost:5000
+echo    http://localhost:%PORT%
 echo.
 echo The server window will stay open while running.
 echo Press Ctrl+C to stop the server when done.
@@ -142,11 +172,12 @@ echo.
 
 REM Open browser
 timeout /t 2 /nobreak >nul
-start http://localhost:5000
+start http://localhost:%PORT%
 
 REM Run Flask
 cd backend
-python app.py
+set "PORT=%PORT%"
+%PYTHON% app.py
 
 REM When server stops
 echo.

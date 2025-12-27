@@ -1,5 +1,9 @@
 # Run the demo (Windows / PowerShell)
 
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$projectRoot = Resolve-Path (Join-Path $scriptDir "..")
+Set-Location $projectRoot
+
 Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host "Secure Channel Demo - Simple Launcher" -ForegroundColor Cyan
 Write-Host "============================================================" -ForegroundColor Cyan
@@ -31,13 +35,26 @@ if (-not (Test-Path "requirements.txt")) {
 # Dependencies
 Write-Host ""
 Write-Host "Checking dependencies..." -ForegroundColor Cyan
+$venvDir = Join-Path $projectRoot ".venv"
+$pythonExe = Join-Path $venvDir "Scripts\\python.exe"
+
+if (-not (Test-Path $pythonExe)) {
+    Write-Host "[INFO] Creating virtual environment (.venv)..." -ForegroundColor Yellow
+    python -m venv $venvDir
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "[ERROR] Failed to create virtual environment" -ForegroundColor Red
+        Read-Host "Press Enter to exit"
+        exit 1
+    }
+}
+
 try {
-    python -c "import flask" 2>&1 | Out-Null
+    & $pythonExe -c "import flask" 2>&1 | Out-Null
     Write-Host "[OK] Dependencies already installed" -ForegroundColor Green
 } catch {
     Write-Host "[INFO] Installing dependencies (this may take a minute)..." -ForegroundColor Yellow
-    python -m pip install --upgrade pip
-    python -m pip install -r requirements.txt
+    & $pythonExe -m pip install --upgrade pip setuptools wheel
+    & $pythonExe -m pip install -r requirements.txt
     if ($LASTEXITCODE -ne 0) {
         Write-Host "[ERROR] Failed to install dependencies!" -ForegroundColor Red
         Write-Host "Please check your internet connection and try again." -ForegroundColor Yellow
@@ -55,8 +72,8 @@ if (-not (Test-Path "frontend")) {
     exit 1
 }
 
-if (-not (Test-Path "frontend\app.py")) {
-    Write-Host "[ERROR] app.py not found in frontend directory!" -ForegroundColor Red
+if (-not (Test-Path "backend\app.py")) {
+    Write-Host "[ERROR] app.py not found in backend directory!" -ForegroundColor Red
     Read-Host "Press Enter to exit"
     exit 1
 }
@@ -66,10 +83,11 @@ Write-Host "============================================================" -Foreg
 Write-Host "Starting Flask server..." -ForegroundColor Cyan
 Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "The server will start at: http://localhost:5000" -ForegroundColor Green
+$port = if ($env:PORT) { [int]$env:PORT } else { 5000 }
+Write-Host "The server will start at: http://localhost:$port" -ForegroundColor Green
 Write-Host ""
 Write-Host "Your browser should open automatically." -ForegroundColor Yellow
-Write-Host "If not, manually open: http://localhost:5000" -ForegroundColor Yellow
+Write-Host "If not, manually open: http://localhost:$port" -ForegroundColor Yellow
 Write-Host ""
 Write-Host "Press Ctrl+C to stop the server" -ForegroundColor Yellow
 Write-Host "============================================================" -ForegroundColor Cyan
@@ -77,9 +95,10 @@ Write-Host ""
 
 # Open the browser
 Start-Sleep -Seconds 3
-Start-Process "http://localhost:5000"
+Start-Process "http://localhost:$port"
 
 # Start server
-Set-Location frontend
-python app.py
+Set-Location backend
+$env:PORT = "$port"
+& $pythonExe app.py
 
