@@ -36,5 +36,8 @@ Thumbs.db
 # Logs
 *.log
 
+# Docs (hide from repo/remote)
+docs/
+
 
 
